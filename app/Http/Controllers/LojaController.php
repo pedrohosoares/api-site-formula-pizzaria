@@ -32,7 +32,7 @@ class LojaController extends Controller
         $this->storeState = $request->route('state');
         $this->storeName = $request->route('name');
         $loja = IpiPizzaria::where('slug', $request->route('name'))->where('estado', Str::upper($request->route('state')))->select(['cod_pizzarias'])->first();
-        $this->cod_pizzarias = $loja->cod_pizzarias;
+        $this->cod_pizzarias = isset($loja->cod_pizzarias)?$loja->cod_pizzarias:null;
         View::share(
             [
             'cod_pizzarias'=>$this->cod_pizzarias,
@@ -42,6 +42,7 @@ class LojaController extends Controller
         );
     }
 
+    
     public function index()
     {
         $pizzas = $combos = array();
@@ -69,5 +70,11 @@ class LojaController extends Controller
         }
         
         return view('home.index', ['combos' => $combos, 'pizzas' => $pizzas]);
+    }
+
+
+    public function state(Request $request){
+        $pizzarias = IpiPizzaria::where('ativa','1')->where('estado','LIKE','%'.$this->storeState)->get();
+        return view('home.state',['pizzas'=>$pizzarias,'estado'=>$request->route('state')]);
     }
 }

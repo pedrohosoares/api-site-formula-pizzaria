@@ -35,6 +35,5 @@
         <a class="skip-link screen-reader-text" href="#content">{{ __('Sair para conteúdo') }}</a>
 
         @include('components/menu_loja')
-        @include('components/menu_icons')
     </div>
 </header>

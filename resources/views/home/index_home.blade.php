@@ -1,9 +1,11 @@
 @include('layouts.header')
 
 <style>
-    .secondary-navigation ul.menu > li > a, .secondary-navigation ul.nav-menu > li > a{
+    .secondary-navigation ul.menu>li>a,
+    .secondary-navigation ul.nav-menu>li>a {
         color: #2c2c2c;
     }
+
     .owl-carousel-home:after {
         content: "";
         display: block;
@@ -103,4 +105,21 @@
         </div>
     </div>
 </div>
+<div class="modal">
+    <div>
+        <h2>Título</h2>
+    </div>
+    <div> assa </div>
+</div>
+<div class="fundoModal"></div>
+
+<script>
+    const itens = document.querySelectorAll('div.product-inner a');
+    itens.forEach((v)=>{
+        v.onclick = (e){
+            e.preventDefault();
+            console.log(teste);
+        }
+    });
+</script>
 @include('layouts.footer')

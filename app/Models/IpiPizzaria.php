@@ -104,8 +104,6 @@ class IpiPizzaria extends Eloquent
 	];
 
 	protected $dates = [
-		'horario_inicial',
-		'horario_final',
 		'data_inauguracao'
 	];
 

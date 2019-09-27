@@ -31,10 +31,16 @@ class LojaController extends Controller
     {
         $this->storeState = $request->route('state');
         $this->storeName = $request->route('name');
-        $loja = IpiPizzaria::where('slug', $request->route('name'))->where('estado', Str::upper($request->route('state')))->select(['cod_pizzarias'])->first();
+        
+        $loja = IpiPizzaria::where('slug', $request->route('name'))
+        ->where('estado', Str::upper($request->route('state')))
+        ->select(['cod_pizzarias','nome','endereco','numero','cidade','estado','cep'])
+        ->first();
+        
         $this->cod_pizzarias = isset($loja->cod_pizzarias)?$loja->cod_pizzarias:null;
         View::share(
             [
+            'loja'=>$loja,
             'cod_pizzarias'=>$this->cod_pizzarias,
             'storeState'=>$this->storeState,
             'storeName'=>$this->storeName

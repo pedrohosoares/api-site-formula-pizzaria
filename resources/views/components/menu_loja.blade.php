@@ -1,7 +1,7 @@
 <div class="header-wrap" style="border-bottom: 1px solid #CB334B;">
     <div class="site-branding">
-        <a href="https://transvelo.github.io/pizzaro-html/index.html" class="custom-logo-link" rel="home">
-            <img src="http://localhost:8000/img/formula_pizzaria_delivery.jpg" class="">
+        <a href="{{ URL::to('/') }}" class="custom-logo-link" rel="home">
+            <img src="{{ asset('img/formula_pizzaria_delivery.jpg') }}" class="">
         </a>
     </div>
     <nav id="site-navigation" class="main-navigation" aria-label="Primary Navigation">

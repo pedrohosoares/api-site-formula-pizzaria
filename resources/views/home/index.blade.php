@@ -86,33 +86,25 @@
 </style>
 <div id="page" class="hfeed site">
     @include('layouts.topo_menu_abaixo')
-    @include('components.combos')
     <div style="margin-top:50px;padding-left: 56px;padding-right: 40px;">
         <div id="primary">
             <main id="main" class="site-main">
-                <h1 class="lateral" style=" margin-top: 85px; height: 85px;text-align: center; color: #2c2c2c; ">{{ __('Pizzas mais pedidas') }}</h1>
-                @include('components.pizzas_mais_pedidas')
-                <h1 class="lateral" style=" margin-top: 85px; height: 85px;text-align: center; color: #2c2c2c; ">{{ __('Bebidas Mais Pedidas') }}</h1>
-                @include('components.bebidas_mais_vendidas')
-                <h1 class="lateral" style=" margin-top: 85px; height: 85px;text-align: center; color: #2c2c2c; ">{{ __('Sobremesas mais Pedidas') }}</h1>
-                @include('components.sobremesas')
-                
-                <nav class="woocommerce-pagination">
-                    <ul class="page-numbers">
-                        <li>
-                            <span class="page-numbers current">1</span>
-                        </li>
-                        <li>
-                            <a class="page-numbers" href="#">2</a>
-                        </li>
-                        <li>
-                            <a class="page-numbers" href="#">3</a>
-                        </li>
-                        <li>
-                            <a class="next page-numbers" href="#">Carregar mais &nbsp;&nbsp;&nbsp;→</a>
-                        </li>
-                    </ul>
-                </nav>
+                <div class="section-products">
+                    <h2 class="section-title" style="padding-top: 58px;">{{ __('Monte seu Combo') }}</h2>
+                    @include('components.combos')
+                </div>
+                <div class="section-products">
+                    <h2 class="section-title" style="padding-top: 58px;">{{ __('Pizzas mais pedidas') }}</h2>
+                    @include('components.pizzas_mais_pedidas')
+                </div>
+                <div class="section-products">
+                    <h2 class="section-title" style="padding-top: 58px;">{{ __('Bebidas Mais Pedidas') }}</h2>
+                    @include('components.bebidas_mais_vendidas')
+                </div>
+                <div class="section-products">
+                    <h2 class="section-title" style="padding-top: 58px;">{{ __('Sobremesas mais Pedidas') }}</h2>
+                    @include('components.sobremesas')
+                </div>
             </main>
         </div>
     </div>
@@ -125,13 +117,4 @@
 </div>
 <div class="fundoModal"></div>
 
-<script>
-    const itens = document.querySelectorAll('div.product-inner');
-    itens.forEach((v) => {
-        v.onclick = (e) {
-            e.preventDefault();
-            console.log(teste);
-        }
-    });
-</script>
 @include('layouts.footer')

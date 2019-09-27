@@ -1,7 +1,7 @@
 <div class="columns-4">
     <ul class="products">
         @foreach($sobremesas as $sobremesa)
-        <li class="product" style="height: 365px;">
+        <li class="product" style="height: 592px;">
             <div class="product-outer">
                 <div class="product-inner">
                     <div class="product-image-wrapper">
@@ -18,17 +18,15 @@
                                         <span>{{ __('Tamanhos') }}</span>
                                     </h3>
                                     @foreach($sobremesa as $tamanho)
-                                        @if($tamanho->situacao == 'ATIVO')        
-                                            <div class="ywapo_input_container ywapo_input_container_radio">
-                                                <span class="ywapo_label_tag_position_after">
-                                                    <span class="ywapo_option_label ywapo_label_position_after">{{ __($tamanho->conteudo) }}</span>
-                                                </span>
-                                                <span class="ywapo_label_price">
-                                                    <span class="woocommerce-Price-amount amount">
-                                                        <span class="woocommerce-Price-currencySymbol">{{ __('R$') }}</span>{{ number_format($tamanho->preco,2) }}</span>
-                                                </span>
-                                            </div>
-                                        @endif
+                                        <div class="ywapo_input_container ywapo_input_container_radio">
+                                            <span class="ywapo_label_tag_position_after">
+                                                <span class="ywapo_option_label ywapo_label_position_after">{{ __($tamanho->conteudo) }}</span>
+                                            </span>
+                                            <span class="ywapo_label_price">
+                                                <span class="woocommerce-Price-amount amount">
+                                                    <span class="woocommerce-Price-currencySymbol">{{ __('R$') }}</span>{{ number_format($tamanho->preco,2) }}</span>
+                                            </span>
+                                        </div>
                                     @endforeach
                                 </div>
                             </div>

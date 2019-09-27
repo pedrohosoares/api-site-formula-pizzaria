@@ -123,7 +123,7 @@
             </ul>
         </div>
         <div class="handheld-navigation">
-            <span class="phm-close">Close</span>
+            <span class="phm-close">{{ __('Fechar') }}</span>
             <ul class="menu">
                 <li class="menu-item "><a href="shop-grid-3-column.html"><i class="po po-pizza"></i>Pizza</a></li>
                 <li class="menu-item "><a href="shop-grid-3-column.html"><i class="po po-burger"></i>Sanduíches</a></li>

@@ -10,14 +10,12 @@
         <div class="site-info">
             <p class="copyright">Copyright © 2014 Fórmula Pizzaria. {{ __('Todos direitos reservados.') }}</p>
         </div>
-        <a role="button" class="footer-action-btn" data-toggle="collapse" href="{{ URL::to('/').'lojas' }}">
+        <a role="button" class="footer-action-btn" href="{{ URL::to('/').'/'.'lojas' }}">
             <i class="po po-map-marker"></i>
             {{ __('Veja aonde estamos') }}
         </a>
     </div>
-    <!-- .col-full -->
 </footer>
-<!-- #colophon -->
 </div>
 <script type="text/javascript" src="{{ asset('js/jquery.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/tether.min.js') }}"></script>
@@ -47,6 +45,15 @@
         ],
         dots: true
     });
+
+    $(window).scroll(function(e){
+        if($(this).scrollTop() >= 120){
+            $('div.pizzaro-secondary-navigation').attr('style','position:fixed;box-shadow: 0px -3px 10px;background: #FFF;top:0;margin-top:0px;');
+        }else{
+            $('div.pizzaro-secondary-navigation').attr('style','background: #FFF;');
+        }
+    });
+
 </script>
 
 </body>

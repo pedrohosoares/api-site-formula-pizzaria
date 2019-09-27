@@ -116,5 +116,5 @@
     <div> assa </div>
 </div>
 <div class="fundoModal"></div>
-
+@include('components.mapa')
 @include('layouts.footer')

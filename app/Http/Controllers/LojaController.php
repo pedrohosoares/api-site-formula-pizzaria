@@ -42,39 +42,25 @@ class LojaController extends Controller
         );
     }
 
-    
+    //Página do lojista
     public function index()
     {
         $pizzas = $combos = array();
-        $pizzasCruas = IpiPizzasIpiTamanho::where('ipi_pizzas_ipi_tamanhos.cod_pizzarias', $this->cod_pizzarias)->limit(39)->get();
-
-        foreach ($pizzasCruas as $pizza) {
-            $pizzas[$pizza->ipi_pizza->cod_pizzas] = array(
-                'pizza'=>$pizza->ipi_pizza->pizza,
-                'cod_pizzas' => $pizza->ipi_pizza->cod_pizzas,
-                'foto_grande' => $pizza->ipi_pizza->foto_grande,
-                'foto_pequena' => $pizza->ipi_pizza->foto_pequena,
-                'tamanhos' => array()
-            );
-        }
-        foreach ($pizzasCruas as $pizza) {
-            foreach($pizza->ipi_pizza->ipi_ingredientes as $ingredientes){
-                $ingrediente[] = $ingredientes->ingrediente;
-            }
-            $pizzas[$pizza->ipi_pizza->cod_pizzas]['tamanhos'][] = array(
-                'tamanho' => $pizza->ipi_tamanho->tamanho,
-                'preco' => $pizza->preco,
-                'cod_tamanho' => $pizza->ipi_tamanho->cod_tamanhos,
-                'ingredientes'=>$ingrediente
-            );
-        }
         
-        return view('home.index', ['combos' => $combos, 'pizzas' => $pizzas]);
+        $maisPedidas = Controller::maisPedidas($this->cod_pizzarias);
+        $bebidasMaisPedidas = Controller::escolherBebidas($this->cod_pizzarias);
+        $sobremesas = Controller::sobremesas($this->cod_pizzarias);
+        return view('home.index', ['sobremesas'=>$sobremesas,'bebidasMaisPedidas'=>$bebidasMaisPedidas,'maisPedidas'=>$maisPedidas,'combos' => $combos, 'pizzas' => $pizzas]);
     }
 
 
     public function state(Request $request){
         $pizzarias = IpiPizzaria::where('ativa','1')->where('estado','LIKE','%'.$this->storeState)->get();
         return view('home.state',['pizzas'=>$pizzarias,'estado'=>$request->route('state')]);
+    }
+
+    public function lojas(){
+        $pizzarias = IpiPizzaria::where('ativa','1')->where('estado','LIKE','%'.$this->storeState)->get();
+        return view('home.state',['pizzas'=>$pizzarias,'estado'=>'']);
     }
 }

@@ -90,29 +90,9 @@
     <div style="margin-top:50px;padding-left: 56px;padding-right: 40px;">
         <div id="primary">
             <main id="main" class="site-main">
-                <h1 class="lateral" style=" margin-top: 85px; height: 85px;text-align: center; color: #2c2c2c; ">{{ __('Pizzas mais pedidas') }}</h1>
-                @include('components.pizzas_mais_pedidas')
-                <h1 class="lateral" style=" margin-top: 85px; height: 85px;text-align: center; color: #2c2c2c; ">{{ __('Bebidas Mais Pedidas') }}</h1>
-                @include('components.bebidas_mais_vendidas')
-                <h1 class="lateral" style=" margin-top: 85px; height: 85px;text-align: center; color: #2c2c2c; ">{{ __('Sobremesas mais Pedidas') }}</h1>
-                @include('components.sobremesas')
-                
-                <nav class="woocommerce-pagination">
-                    <ul class="page-numbers">
-                        <li>
-                            <span class="page-numbers current">1</span>
-                        </li>
-                        <li>
-                            <a class="page-numbers" href="#">2</a>
-                        </li>
-                        <li>
-                            <a class="page-numbers" href="#">3</a>
-                        </li>
-                        <li>
-                            <a class="next page-numbers" href="#">Carregar mais &nbsp;&nbsp;&nbsp;→</a>
-                        </li>
-                    </ul>
-                </nav>
+                @foreach($tipo as $menu)
+                    <h1 class="lateral" style=" text-align: center; color: #2c2c2c; ">{{ __($menu->tipo_pizza) }}</h1>
+                @endforeach
             </main>
         </div>
     </div>

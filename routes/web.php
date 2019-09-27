@@ -17,8 +17,9 @@ Route::get('/combos/{name?}','HomeController@combos')->name('combos');
 
 //URL para loja especifica
 Route::name('loja')->group(function(){
-    Route::match(['post','get'],'/{state}/{name}','LojaController@index')->name('loja');
-    Route::match(['post','get'],'/{state}','LojaController@state')->name('loja_estado');
+    Route::match(['post','get'],'/lojas','LojaController@lojas')->name('lojas');
+    Route::match(['post','get'],'/lojas/{state}/{name}','LojaController@index')->name('loja');
+    Route::match(['post','get'],'/lojas/{state}','LojaController@state')->name('loja_estado');
 });
 
 Route::get('/getTamanhos/{quantidade?}/{situacao?}','TamanhoController@getTamanhos')->name('getTamanhos');

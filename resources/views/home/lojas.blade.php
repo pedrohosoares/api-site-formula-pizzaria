@@ -89,14 +89,9 @@
     @include('components.combos')
     <div style="margin-top:50px;padding-left: 56px;padding-right: 40px;">
         <div id="primary">
+            <h1 class="lateral" style=" text-align: center; color: #2c2c2c; ">Pizzas mais pedidas</h1>
             <main id="main" class="site-main">
-                <h1 class="lateral" style=" margin-top: 85px; height: 85px;text-align: center; color: #2c2c2c; ">{{ __('Pizzas mais pedidas') }}</h1>
                 @include('components.pizzas_mais_pedidas')
-                <h1 class="lateral" style=" margin-top: 85px; height: 85px;text-align: center; color: #2c2c2c; ">{{ __('Bebidas Mais Pedidas') }}</h1>
-                @include('components.bebidas_mais_vendidas')
-                <h1 class="lateral" style=" margin-top: 85px; height: 85px;text-align: center; color: #2c2c2c; ">{{ __('Sobremesas mais Pedidas') }}</h1>
-                @include('components.sobremesas')
-                
                 <nav class="woocommerce-pagination">
                     <ul class="page-numbers">
                         <li>

@@ -65,7 +65,13 @@
     @include('layouts.menu_formula')
     <div style="margin-top:50px;padding-left: 56px;padding-right: 40px;">
         <div id="primary">
-            <h1 class="titulo text-center">{{ __('Fórmulas Pizzarias no estado de ').$estado }}</h1>
+            <h1 class="titulo text-center">
+            @if(!empty($estado))
+                {{ __('Fórmula Pizzaria no estado de ').$estado }}
+            @else
+                {{ __('Conheça todas unidades da Fórmula Pizzaria') }}
+            @endif
+            </h1>
             <main id="main" class="site-main">
                 <div class="columns-3">
                     <ul class="products">
@@ -74,7 +80,7 @@
                             <div class="product-outer">
                                 <div class="product-inner">
                                     <div class="product-image-wrapper">
-                                        <a href="/{{ $estado }}/{{ $pizzaria->slug }}" rel="Fórmula Pizzaria {{ $pizzaria->nome }}" class="woocommerce-LoopProduct-link">
+                                        <a href="{{ URL::to('/')}}/lojas/{{ $pizzaria->estado }}/{{ $pizzaria->slug }}" rel="Fórmula Pizzaria {{ $pizzaria->nome }}" class="woocommerce-LoopProduct-link">
                                             <figure class="logo-formula-pizzarias">
                                             @if(!empty($pizzaria->foto_pequena))
                                                 <img src="{{ env('IMG_PIZZARIAS').$pizzaria->foto_pequena }}" class="img-responsive" alt="">
@@ -85,7 +91,7 @@
                                         </a>
                                     </div>
                                     <div class="product-content-wrapper">
-                                        <a href="/{{ $estado }}/{{ $pizzaria->slug }}" rel="Fórmula Pizzaria {{ $pizzaria->nome }}" class="woocommerce-LoopProduct-link">
+                                        <a href="{{ URL::to('/')}}/lojas/{{ $pizzaria->estado }}/{{ $pizzaria->slug }}" rel="Fórmula Pizzaria {{ $pizzaria->nome }}" class="woocommerce-LoopProduct-link">
                                             <h3>{{ __($pizzaria->nome) }}</h3>
                                             <div class="yith_wapo_groups_container">
                                                 <div class="ywapo_group_container ywapo_group_container_radio form-row form-row-wide " data-requested="1" data-type="radio" data-id="1" data-condition="">

@@ -6,7 +6,6 @@ public/storage
 storage/*.key
 vendor
 /.tmp.drivedownload
-.env
 .env.backup
 .phpunit.result.cache
 Homestead.json

@@ -77,7 +77,7 @@ class Controller extends BaseController
     public function maisPedidas($cod_pizzarias)
     {
         return DB::table('ipi_pizzas')
-            ->select(['ipi_pizzas.cod_pizzas', 'ipi_pizzas.foto_grande', 'ipi_pizzas.pizza', 'ipi_pizzas_ipi_tamanhos.preco', 'ipi_tamanhos.tamanho'])
+            ->select(['ipi_pizzas.cod_pizzas', 'ipi_pizzas.foto_grande', 'ipi_pizzas.pizza', 'ipi_pizzas_ipi_tamanhos.preco', 'ipi_tamanhos.tamanho','ipi_tamanhos.cod_tamanhos'])
             ->leftJoin('ipi_tipo_pizza', 'ipi_pizzas.cod_tipo_pizza', 'ipi_tipo_pizza.cod_tipo_pizza')
             ->join('ipi_pizzas_ipi_tamanhos', 'ipi_pizzas.cod_pizzas', 'ipi_pizzas_ipi_tamanhos.cod_pizzas')
             ->leftJoin('ipi_tamanhos', 'ipi_pizzas_ipi_tamanhos.cod_tamanhos', 'ipi_tamanhos.cod_tamanhos')
@@ -97,6 +97,22 @@ class Controller extends BaseController
         ->where('ipi_combos.situacao','ATIVO')
         ->get()
         ->groupBy('nome_combo');
+    }
+
+    public function selectIngredientes($cod_pizzas){
+        return DB::table('ipi_ingredientes')
+        ->leftJoin('ipi_ingredientes_ipi_pizzas','ipi_ingredientes_ipi_pizzas.cod_ingredientes','ipi_ingredientes.cod_ingredientes')
+        ->where('ipi_ingredientes_ipi_pizzas.cod_pizzas',$cod_pizzas)
+        ->get();
+    }
+
+    public function selectBorda($cod_tamanho,$cod_pizzarias){
+        return DB::table('ipi_bordas')
+        ->select(['ipi_bordas.borda','ipi_bordas.cod_bordas','ipi_tamanhos_ipi_bordas.preco'])
+        ->leftJoin('ipi_tamanhos_ipi_bordas','ipi_tamanhos_ipi_bordas.cod_bordas','ipi_bordas.cod_bordas')
+        ->where('ipi_tamanhos_ipi_bordas.cod_tamanhos',$cod_tamanho)
+        ->where('ipi_tamanhos_ipi_bordas.cod_pizzarias',$cod_pizzarias)
+        ->get();
     }
     
 }

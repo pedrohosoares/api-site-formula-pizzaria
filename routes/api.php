@@ -25,3 +25,6 @@ Route::get('/peddings/cancel/{token}','PedidoController@peddingCancel');
 
 //ROTAS DE ATUALIZACAO DE PEDIDOS
 Route::get('/peddings/sendStatus/{token}/{field}/{status}/{id}','PedidoController@sendStatus');
+
+//AJAX
+Route::get('/ajaxBordas/{cod_produto}/{cod_pizzaria}','PedidoController@ajaxBordas');

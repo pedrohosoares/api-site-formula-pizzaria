@@ -36,8 +36,9 @@ class LojaController extends Controller
         ->where('estado', Str::upper($request->route('state')))
         ->select(['cod_pizzarias','nome','endereco','numero','cidade','estado','cep'])
         ->first();
-        
+
         $this->cod_pizzarias = isset($loja->cod_pizzarias)?$loja->cod_pizzarias:null;
+        
         View::share(
             [
             'loja'=>$loja,
@@ -59,10 +60,11 @@ class LojaController extends Controller
     }
 
     public function combos(){
+
         $sobremesas = $pizzas = $bebidasMaisPedidas = $maisPedidas = array();
         $combos = Controller::selectCombos($this->cod_pizzarias);
-        dd($combos);
         return view('home.index', ['sobremesas'=>$sobremesas,'bebidasMaisPedidas'=>$bebidasMaisPedidas,'maisPedidas'=>$maisPedidas,'combos' => $combos, 'pizzas' => $pizzas]);
+    
     }
 
     public function pizzas(){

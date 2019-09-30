@@ -17,22 +17,19 @@
     </div>
 </footer>
 </div>
-<script type="text/javascript" src="{{ asset('js/jquery.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/tether.min.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/bootstrap.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/owl.carousel.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/social.share.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/jquery.mCustomScrollbar.concat.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/scripts.min.js') }}"></script>
-<!-- For demo purposes – can be removed on production -->
 <script src="{{ asset('js/switchstylesheet.js') }}"></script>
-<!-- For demo purposes – can be removed on production : End -->
 
 <script>
     //Carrousel de itens dos combos
     $(document).ready(function() {
         $('.owl-carousel').owlCarousel();
     });
+
     $('.sliderHome').owlCarousel({
         stagePadding: 0,
         items: 1,
@@ -49,26 +46,13 @@
 
 
     //Arrasta menu para baixo no desktop
-    $(window).scroll(function(e){
-        if($(this).scrollTop() >= 120){
-            $('div.pizzaro-secondary-navigation').attr('style','position:fixed;box-shadow: 0px -3px 10px;background: #FFF;top:0;margin-top:0px;');
-        }else{
-            $('div.pizzaro-secondary-navigation').attr('style','background: #FFF;');
+
+    $(window).scroll(function(e) {
+        if ($(this).scrollTop() >= 120) {
+            $('div.pizzaro-secondary-navigation').attr('style', 'position:fixed;box-shadow: 0px -3px 10px;background: #FFF;top:0;margin-top:0px;');
+        } else {
+            $('div.pizzaro-secondary-navigation').attr('style', 'background: #FFF;');
         }
-    });
-
-    //JSON de dados para motar tela de pedido
-    const poeDadosJanelaModal = function(elemento){
-        let json = JSON.parse($(elemento).parents('li').attr('json'));
-        json.forEach(function(e){
-            console.log(e);
-        });
-        console.log(json);
-    }
-
-    $('.fazer-pedido').click(function(e){
-        e.preventDefault();
-        $('.modalFazerPedido').modal('show');
     });
 
 </script>

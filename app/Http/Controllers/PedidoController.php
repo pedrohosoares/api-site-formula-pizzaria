@@ -65,6 +65,12 @@ class PedidoController extends PizzaController
     *  - BAIXADO
     *  - 
     */
+
+
+    public function ajaxBordas($cod_tamanho,$cod_pizzaria){
+       return  Controller::selectBorda($cod_tamanho,$cod_pizzaria);
+    }
+
     public function sendStatus($token,$field,$status,$id){
         $pizzarias = DB::table('ipi_pizzarias')->select('cod_pizzarias')->where('token_loja','=',$token)->first();
         if(!empty($pizzarias)){

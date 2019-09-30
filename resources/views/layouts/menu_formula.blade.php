@@ -29,7 +29,7 @@
         margin-top: 38px;
     }
 </style>
-<header id="masthead" class="site-header header-v1" style="background-image: none;margin-top: -29px;height: 172px;">
+<header id="masthead" class="site-header header-v1" style="background-image: none;margin-top: -29px;height: 172px;width:100%;">
     <div class="col-full">
         <a class="skip-link screen-reader-text" href="#site-navigation">{{ __('Sair para navegação') }}</a>
         <a class="skip-link screen-reader-text" href="#content">{{ __('Sair para conteúdo') }}</a>

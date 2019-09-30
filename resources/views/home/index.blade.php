@@ -100,5 +100,62 @@
     </div>
 </div>
 @include('components.modal_pedido')
+<script>
+    const pegaBordas = function(cod_tamanho) {
+        $.ajax({
+            'method': "GET",
+            'url': "<?php echo URL::to('/'); ?>" + '/api/ajaxBordas/' + cod_tamanho + '/' + <?php echo $cod_pizzarias; ?>,
+            'data': {
+                _token: csrf_token
+            },
+            'dataType': "JSON",
+            complete: function(r) {
+                if (r.responseJSON[0]) {
+                    let borda;
+                    borda = '';
+                    r.responseJSON.forEach(function(v) {
+                        borda += '<div class="form-check form-check-inline">';
+                        borda += '<input class="form-check-input" type="radio" name="ipi_pedidos_bordas[cod_bordas]" value="' + v.cod_bordas + '">';
+                        borda += '<label class="form-check-label" for="inlineCheckbox1">' + v.borda + ' <i>R$' + v.preco + '</i></label>';
+                        borda += '</div>';
+                        $('div#bordas div.col-sm-9').html(borda);
+                    });
+                }
+            }
+        });
+    }
+
+    const poeIngredientesDaPizza = function(cod_pizzas){
+        //Continuar ajax
+    }
+
+    //JSON de dados para motar tela de pedido
+    const poeDadosJanelaModal = function(elemento) {
+        let json = JSON.parse($(elemento).parents('li').attr('json'));
+        $('div.modal-dialog h2#tituloPedido').text(json[0].pizza);
+        let tamanho;
+        tamanho = '';
+        poeIngredientesDaPizza(json[0].cod_pizzas);
+        json.forEach(function(v) {
+            tamanho += '<div class="form-check form-check-inline">';
+            tamanho += '<input class="form-check-input" type="radio" name="ipi_pedidos_pizzas[cod_tamanhos]" value="' + v.cod_tamanhos + '">';
+            tamanho += '<label class="form-check-label" for="inlineCheckbox1">' + v.tamanho + ' <i>R$' + v.preco + '</i></label>';
+            tamanho += '</div>';
+            $('div#tamanhos div.col-sm-9').html(tamanho);
+        });
+
+        let tamanhos = $('input[name="ipi_pedidos_pizzas[cod_tamanhos]"]');
+        $(tamanhos).click(function(e) {
+            let cod_tamanhos = $(this).val();
+            pegaBordas(cod_tamanhos);
+        });
+
+    }
+
+    $('.fazer-pedido').click(function(e) {
+        e.preventDefault();
+        $('.modalFazerPedido').modal('show');
+    });
+</script>
 @include('components.mapa')
 @include('layouts.footer')

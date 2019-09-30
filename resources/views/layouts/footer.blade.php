@@ -29,6 +29,7 @@
 <!-- For demo purposes – can be removed on production : End -->
 
 <script>
+    //Carrousel de itens dos combos
     $(document).ready(function() {
         $('.owl-carousel').owlCarousel();
     });
@@ -46,12 +47,28 @@
         dots: true
     });
 
+
+    //Arrasta menu para baixo no desktop
     $(window).scroll(function(e){
         if($(this).scrollTop() >= 120){
             $('div.pizzaro-secondary-navigation').attr('style','position:fixed;box-shadow: 0px -3px 10px;background: #FFF;top:0;margin-top:0px;');
         }else{
             $('div.pizzaro-secondary-navigation').attr('style','background: #FFF;');
         }
+    });
+
+    //JSON de dados para motar tela de pedido
+    const poeDadosJanelaModal = function(elemento){
+        let json = JSON.parse($(elemento).parents('li').attr('json'));
+        json.forEach(function(e){
+            console.log(e);
+        });
+        console.log(json);
+    }
+
+    $('.fazer-pedido').click(function(e){
+        e.preventDefault();
+        $('.modalFazerPedido').modal('show');
     });
 
 </script>

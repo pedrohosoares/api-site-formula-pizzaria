@@ -66,11 +66,11 @@
     <div style="margin-top:50px;padding-left: 56px;padding-right: 40px;">
         <div id="primary">
             <h1 class="titulo text-center">
-            @if(!empty($estado))
+                @if(!empty($estado))
                 {{ __('Fórmula Pizzaria no estado de ').$estado }}
-            @else
+                @else
                 {{ __('Conheça todas unidades da Fórmula Pizzaria') }}
-            @endif
+                @endif
             </h1>
             <main id="main" class="site-main">
                 <div class="columns-3">
@@ -82,11 +82,11 @@
                                     <div class="product-image-wrapper">
                                         <a href="{{ URL::to('/')}}/lojas/{{ $pizzaria->estado }}/{{ $pizzaria->slug }}" rel="Fórmula Pizzaria {{ $pizzaria->nome }}" class="woocommerce-LoopProduct-link">
                                             <figure class="logo-formula-pizzarias">
-                                            @if(!empty($pizzaria->foto_pequena))
+                                                @if(!empty($pizzaria->foto_pequena))
                                                 <img src="{{ env('IMG_PIZZARIAS').$pizzaria->foto_pequena }}" class="img-responsive" alt="">
-                                            @else
+                                                @else
                                                 <img src="{{ asset('img/formula_pizzaria_delivery.jpg') }}" class="img-responsive" alt="">
-                                            @endif
+                                                @endif
                                             </figure>
                                         </a>
                                     </div>

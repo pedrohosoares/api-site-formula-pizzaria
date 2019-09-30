@@ -1,29 +1,39 @@
 <div class="pizzaro-secondary-navigation" style="background: #FFF;">
     <nav class="secondary-navigation" aria-label="Secondary Navigation" style="/* border-bottom: 4px dotted; */">
         <ul class="menu">
-            <li class="menu-item ">
-                <a href="shop-grid-3-column.html">
-                    <i class="po po-pizza"></i>Pizza
+        <li class="menu-item ">
+                <a href="{{ URL::to('/').'/lojas/'.$storeState.'/'.$storeName.'/mais-pedidas' }}">
+                    <i class="po po-pizza"></i>{{ __('Mais Pedidas') }}
                 </a>
             </li>
             <li class="menu-item ">
-                <a href="shop-grid-3-column.html">
-                    <i class="po po-burger"></i>Sanduíches
+                <a href="{{ URL::to('/').'/lojas/'.$storeState.'/'.$storeName.'/pizzas' }}">
+                    <i class="po po-pizza"></i>{{ __('Pizza') }}
                 </a>
             </li>
             <li class="menu-item ">
-                <a href="shop-grid-3-column.html">
-                    <i class="po po-drinks"></i>Bebidas
+                <a href="{{ URL::to('/').'/lojas/'.$storeState.'/'.$storeName.'/sanduiches' }}">
+                    <i class="po po-burger"></i>{{ __('Sanduíches') }}
                 </a>
             </li>
             <li class="menu-item ">
-                <a href="shop-grid-3-column.html">
-                    <i class="po po-wraps"></i>Combos
+                <a href="{{ URL::to('/').'/lojas/'.$storeState.'/'.$storeName.'/calzone' }}">
+                    <i class="po po-burger"></i>{{ __('Calzones') }}
                 </a>
             </li>
             <li class="menu-item ">
-                <a href="shop-grid-3-column.html">
-                    <i class="po po-fries"></i>Sobremesas
+                <a href="{{ URL::to('/').'/lojas/'.$storeState.'/'.$storeName.'/bebidas' }}">
+                    <i class="po po-drinks"></i>{{ __('Bebidas') }}
+                </a>
+            </li>
+            <li class="menu-item ">
+                <a href="{{ URL::to('/').'/lojas/'.$storeState.'/'.$storeName.'/combos' }}">
+                    <i class="po po-wraps"></i>{{ __('Combos') }}
+                </a>
+            </li>
+            <li class="menu-item ">
+                <a href="{{ URL::to('/').'/lojas/'.$storeState.'/'.$storeName.'/sobremesas' }}">
+                    <i class="po po-fries"></i>{{ __('Sobremesas') }}
                 </a>
             </li>
             <li class="menu-item">

@@ -89,32 +89,16 @@
     <div style="margin-top:50px;padding-left: 56px;padding-right: 40px;">
         <div id="primary">
             <main id="main" class="site-main">
-                <div class="section-products">
-                    <h2 class="section-title" style="padding-top: 58px;">{{ __('Monte seu Combo') }}</h2>
-                    @include('components.combos')
-                </div>
-                <div class="section-products">
-                    <h2 class="section-title" style="padding-top: 58px;">{{ __('Pizzas mais pedidas') }}</h2>
-                    @include('components.pizzas_mais_pedidas')
-                </div>
-                <div class="section-products">
-                    <h2 class="section-title" style="padding-top: 58px;">{{ __('Bebidas Mais Pedidas') }}</h2>
-                    @include('components.bebidas_mais_vendidas')
-                </div>
-                <div class="section-products">
-                    <h2 class="section-title" style="padding-top: 58px;">{{ __('Sobremesas mais Pedidas') }}</h2>
-                    @include('components.sobremesas')
-                </div>
+                @include('components.bebidas')
+                @include('components.pizzas')
+                @include('components.combos')
+                @include('components.pizzas_mais_pedidas')
+                @include('components.bebidas_mais_vendidas')
+                @include('components.sobremesas')
             </main>
         </div>
     </div>
 </div>
-<div class="modal">
-    <div>
-        <h2>Título</h2>
-    </div>
-    <div> assa </div>
-</div>
-<div class="fundoModal"></div>
+@include('components.modal_pedido')
 @include('components.mapa')
 @include('layouts.footer')

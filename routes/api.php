@@ -28,3 +28,5 @@ Route::get('/peddings/sendStatus/{token}/{field}/{status}/{id}','PedidoControlle
 
 //AJAX
 Route::get('/ajaxBordas/{cod_produto}/{cod_pizzaria}','PedidoController@ajaxBordas');
+Route::get('/ajaxIngredientes/{cod_pizzas}','PedidoController@ajaxIngredientes');
+Route::get('/ajaxIngredientesAdicionais/{cod_pizzarias}/{cod_tamanho}','PedidoController@ajaxIngredientesAdicionais');

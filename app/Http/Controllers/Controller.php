@@ -101,8 +101,18 @@ class Controller extends BaseController
 
     public function selectIngredientes($cod_pizzas){
         return DB::table('ipi_ingredientes')
+        ->select(['ipi_ingredientes.ingrediente','ipi_ingredientes.cod_ingredientes'])
         ->leftJoin('ipi_ingredientes_ipi_pizzas','ipi_ingredientes_ipi_pizzas.cod_ingredientes','ipi_ingredientes.cod_ingredientes')
         ->where('ipi_ingredientes_ipi_pizzas.cod_pizzas',$cod_pizzas)
+        ->get();
+    }
+
+    public function selectIngredientesAdicionais($cod_pizzaria,$cod_tamanhos){
+        return DB::table('ipi_ingredientes')
+        ->select(['ipi_ingredientes_ipi_tamanhos.preco','ipi_ingredientes_ipi_tamanhos.cod_ingredientes','ipi_ingredientes.ingrediente'])
+        ->leftJoin('ipi_ingredientes_ipi_tamanhos','ipi_ingredientes.cod_ingredientes','ipi_ingredientes_ipi_tamanhos.cod_ingredientes')
+        ->where('ipi_ingredientes_ipi_tamanhos.cod_tamanhos',$cod_tamanhos)
+        ->where('ipi_ingredientes_ipi_tamanhos.cod_pizzarias',$cod_pizzaria)
         ->get();
     }
 

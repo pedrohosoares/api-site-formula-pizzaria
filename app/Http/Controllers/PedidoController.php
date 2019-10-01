@@ -71,6 +71,14 @@ class PedidoController extends PizzaController
        return  Controller::selectBorda($cod_tamanho,$cod_pizzaria);
     }
 
+    public function ajaxIngredientes($cod_pizzas){
+        return Controller::selectIngredientes($cod_pizzas);
+    }
+
+    public function ajaxIngredientesAdicionais($cod_pizzaria,$cod_tamanho){
+        return Controller::selectIngredientesAdicionais($cod_pizzaria,$cod_tamanho);
+    }
+
     public function sendStatus($token,$field,$status,$id){
         $pizzarias = DB::table('ipi_pizzarias')->select('cod_pizzarias')->where('token_loja','=',$token)->first();
         if(!empty($pizzarias)){

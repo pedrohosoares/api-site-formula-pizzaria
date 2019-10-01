@@ -7,7 +7,8 @@
         margin-right: 10px;
         margin-top: 1px;
     }
-    .modalFazerPedido{
+
+    .modalFazerPedido {
         z-index: 99999;
     }
 </style>
@@ -22,7 +23,7 @@
                     </button>
                 </div>
                 <div class="row" style="margin-left:5px" id="ingredientePedido">
-                    <p id="ingrediente">{{ __('Mussarela, presunto, azeitona preta, oregano, molho de tomate e cebola.') }}</p>
+                    <p id="ingrediente"></p>
                 </div>
             </div>
             <div class="modal-body" style=" overflow-y: scroll; max-height: 275px;">
@@ -37,14 +38,15 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-lg btn-secondary" data-dismiss="modal">{{ __('Finalizar Pedido') }}{{ __(' R$') }}
+                <button style="margin-right:10px;" type="button" class="btn btn-lg btn-secondary" data-dismiss="modal">{{ __('Finalizar Pedido') }}{{ __(' R$') }}
                     <span id="valorTotal">0.00</span>
                 </button>
-                <div class="input-group" style="float: right;margin-left: 20px;">
-                    <span style="float: left;margin-right: 10px;font-size:20px;margin-top: 7px;">{{ __('Qntd: ') }} </span>
-                    <i style="float: left;margin-right:10px; font-size: 37px; cursor: pointer; " class="glyphicon glyphicon-minus"></i>
-                    <input type="text" class="form-control" value="1" style="text-align:center;width: 63px;margin-right:10px;height: 48px;font-size: 29px;padding-right: 2px;padding-left: 2px;">
-                    <i class="glyphicon glyphicon-plus" style=" font-size: 37px; cursor: pointer; "></i>
+                <div class="conjuntoQuantidade" style="float: right;width: 114px;">
+                    <div class="form-check form-check-inline addIngrediente">
+                        <span class="plus qntdPedidoPlus">+</span>
+                        <input type="text" name="quantidade" value="0" class="form-check-input input-addingredientes">
+                        <span class="minus qntdPedidoMinus" style="margin-left: 5px;">-</span>
+                    </div>
                 </div>
             </div>
         </div>

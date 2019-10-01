@@ -2734,7 +2734,8 @@ body {
   padding-bottom: 1em;
   background-position: center center;
   position: relative;
-  z-index: 999; }
+  z-index: 999; 
+}
   .site-header .site-logo-anchor, .site-header .site-logo-link, .site-header .custom-logo-link {
     display: block; }
     .site-header .site-logo-anchor img, .site-header .site-logo-link img, .site-header .custom-logo-link img {
@@ -6995,7 +6996,7 @@ ul.products > li.product {
         width: 41.6666666667%; } }
     @media (min-width: 992px) {
       .header-v1 .main-navigation {
-        width: 41.6666666667%; } }
+        width: 53.6666666667%; } }
   .header-v1 .header-info-wrapper {
     width: 100%;
     padding: 0; }
@@ -10229,6 +10230,7 @@ article.post {
   header#masthead{
     position:fixed;
     top:0;
+    height: 107px;
   }
 }
 
@@ -11871,8 +11873,9 @@ ul.products li.product, .products .owl-item > .product {
       position: relative;
       z-index: 1; }
   .ywapo_input_container_radio:hover .ywapo_label_tag_position_after::before {
-    background-color: #ffcd00;
-    border: 2px solid #ffcd00; }
+    /*background-color: #ffcd00;*/
+    /*border: 2px solid #ffcd00;*/ 
+  }
   .ywapo_input_container_radio .ywapo_label_price {
     line-height: 1;
     display: inline-block;
@@ -14707,6 +14710,14 @@ p.order-again .button:after {
 
 @media (max-width: 767px) {
   /*(max-width: 767px)*/
+
+  .site-header .site-logo-anchor img, .site-header .site-logo-link img, .site-header .custom-logo-link img{
+    max-width:155px;
+  }
+  header#masthead{
+    height: 131px;
+  }
+
   ul.products li.product, .products .owl-item > .product {
     width: 100%; }
   .woocommerce-page.archive .pizzaro-sorting form {
@@ -15427,6 +15438,9 @@ p.order-again .button:after {
 
 @media (min-width: 992px) {
   /*min-width: 992px*/
+  header#masthead{
+    height: 131px;
+  }
   @media (max-width: 1199px) {
     /*(max-width: 1199px)*/
     .right-sidebar.list-view.columns-2 ul.products li.product .product-inner, .left-sidebar.list-view.columns-2 ul.products li.product .product-inner {

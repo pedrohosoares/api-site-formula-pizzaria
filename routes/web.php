@@ -29,6 +29,10 @@ Route::name('loja')->group(function(){
     Route::match(['post','get'],'/lojas/{state}/{name}/sobremesas','LojaController@sobremesas')->name('sobremesas');
 });
 
+Route::get('/accounts','ClienteController@accounts')->name('accounts');
+Route::get('/clientes/user','ClienteController@user')->name('user');
+Route::get('/clientes/account','ClienteController@account')->name('account');
+
 Route::get('/getTamanhos/{quantidade?}/{situacao?}','TamanhoController@getTamanhos')->name('getTamanhos');
 Route::get('/getBebidas/','BebidaController@getBebidas')->name('getBebidas');
 Route::get('/getPizzas/','PizzaController@getPizzas')->name('getPizzas');

@@ -49,12 +49,13 @@
 
     $(window).scroll(function(e) {
         if ($(this).scrollTop() >= 120) {
-            $('div.pizzaro-secondary-navigation').attr('style', 'position:fixed;box-shadow: 0px -3px 10px;background: #FFF;top:0;margin-top:0px;');
+            $('div.pizzaro-secondary-navigation').attr('style', 'position:fixed;box-shadow: 0px -3px 10px;background: #FFF;top:0;margin-top:-20px;');
+            $('header#masthead').attr('style','width:85%;')
         } else {
             $('div.pizzaro-secondary-navigation').attr('style', 'background: #FFF;');
+            $('header#masthead').attr('style','')
         }
     });
-
 </script>
 
 </body>

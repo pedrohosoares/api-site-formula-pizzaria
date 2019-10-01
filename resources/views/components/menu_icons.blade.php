@@ -1,7 +1,8 @@
-<div class="pizzaro-secondary-navigation" style="background: #FFF;">
+@if(!empty($loja) and isset($loja))
+<div class="pizzaro-secondary-navigation" id="iconesItens">
     <nav class="secondary-navigation" aria-label="Secondary Navigation" style="/* border-bottom: 4px dotted; */">
-        <ul class="menu">
-        <li class="menu-item ">
+        <ul class="menu iconesMenu">
+            <li class="menu-item ">
                 <a href="{{ URL::to('/').'/lojas/'.$storeState.'/'.$storeName.'/mais-pedidas' }}">
                     <i class="po po-pizza"></i>{{ __('Mais Pedidas') }}
                 </a>
@@ -45,3 +46,4 @@
         </ul>
     </nav>
 </div>
+@endif

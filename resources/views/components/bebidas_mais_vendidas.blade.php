@@ -8,12 +8,12 @@
                 <div class="product-outer">
                     <div class="product-inner">
                         <div class="product-image-wrapper">
-                            <a href="#" class="woocommerce-LoopProduct-link">
+                            <a href="#"  class="fazer-pedido" onclick = "poeDadosJanelaModal(this)">
                                 <img src="{{ env('IMG_BEBIDAS').$bebida[0]->foto_grande }}" class="img-responsive" alt="">
                             </a>
                         </div>
                         <div class="product-content-wrapper">
-                            <a href="#" class="woocommerce-LoopProduct-link">
+                            <a href="#" class="fazer-pedido" onclick = "poeDadosJanelaModal(this)">
                                 <h3>{{ __($bebida[0]->bebida) }}</h3>
                                 <div class="yith_wapo_groups_container">
                                     <div class="ywapo_group_container ywapo_group_container_radio form-row form-row-wide " data-requested="1" data-type="radio" data-id="1" data-condition="">
@@ -37,7 +37,7 @@
                                 </div>
                             </a>
                             <div class="hover-area">
-                                <a rel="nofollow" href="single-product-v1.html" data-quantity="1" data-product_id="51" data-product_sku="" class="button product_type_simple add_to_cart_button ajax_add_to_cart">
+                                <a rel="nofollow" href="#"  class="button fazer-pedido" onclick = "poeDadosJanelaModal(this)">
                                     {{ __('Add ao carrinho') }}
                                 </a>
                             </div>

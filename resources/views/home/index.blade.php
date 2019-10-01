@@ -120,8 +120,20 @@
 </div>
 @include('components.modal_pedido')
 <script>
-    
     const valores = {
+        "bebidas": [
+            {
+                "cod_bebidas": "",
+                "cod_bebidas_ipi_conteudos": "",
+                "nome": "",
+                "preco": ""
+            }
+        ],
+        "combos": [{
+            "cod_combos": "",
+            "nome": "",
+            "preco": ""
+        }],
         "tamanho": {
             "cod_tamanhos": "",
             "tamanho": "",
@@ -136,20 +148,21 @@
         "quantidade": 1
     };
 
-    const quantidadePadrao = function(){
+    const quantidadePadrao = function() {
         $('input[name="quantidade"]').val(valores.quantidade);
     }
 
     quantidadePadrao();
 
-    const mudaQuantidadeItens = function(){
-        $('span.qntdPedidoPlus,span.qntdPedidoMinus').click(function(){
+    const mudaQuantidadeItens = function() {
+        $('span.qntdPedidoPlus,span.qntdPedidoMinus').click(function() {
             let este = $(this).parent().find('input[name="quantidade"]').val();
             valores.quantidade = Number.parseInt(este);
         });
     }
-    
+
     mudaQuantidadeItens();
+
 
 
     const pegaBordas = function(cod_tamanho) {
@@ -203,33 +216,33 @@
     }
 
     //SOMA TOTAL DO VALOR
-    const somaValorTotal = function(){
+    const somaValorTotal = function() {
 
         let valorPedido;
         valorPedido = 0.00;
 
-        
-        for(e in valores){
-            
-            if(e == 'adicionais' && valores[e].length == undefined){
-                valores[e].forEach(function(adicional){
+
+        for (e in valores) {
+
+            if (e == 'adicionais' && valores[e].length == undefined) {
+                valores[e].forEach(function(adicional) {
                     valorPedido += Number.parseFloat(adicional.preco);
                 });
             }
-            
-            if(e == 'borda' && valores[e].length == undefined){
+
+            if (e == 'borda' && valores[e].length == undefined) {
                 valorPedido += Number.parseFloat(valores[e].preco);
             }
-            
-            if(e == 'tamanho' && valores[e].length == undefined){
+
+            if (e == 'tamanho' && valores[e].length == undefined) {
                 valorPedido += Number.parseFloat(valores[e].preco);
             }
-            if(e == 'quantidade' && valores[e].length == undefined){
+            if (e == 'quantidade' && valores[e].length == undefined) {
                 valorPedido = valorPedido * Number.parseInt(valores[e]);
             }
-            
+
         };
-        
+
         valorPedido = valorPedido.toFixed(2);
 
         $('button span#valorTotal').text(valorPedido);
@@ -306,7 +319,7 @@
             let dados = $(este).parent().find('input.input-addingredientes');
             //SALVA ADICIONAIS
             salvaIngrediente(dados);
-            
+
             if (valor == NaN || valor < 0) {
                 valor = 0;
             } else {
@@ -381,7 +394,7 @@
             valores.borda.cod_bordas = $(this).val();
             valores.borda.borda = $(this).attr('borda');
             valores.borda.preco = $(this).attr('preco');
-            
+
             //SOMA VALORES
             somaValorTotal();
 
@@ -410,6 +423,7 @@
         let tamanhos = $('input[name="ipi_pedidos_pizzas[cod_tamanhos]"]');
 
         $(tamanhos).click(function(e) {
+
             let cod_tamanhos = $(this).val();
 
             //COLOCA DADOS DE ESCOLHA
@@ -417,7 +431,7 @@
             valores.tamanho.preco = $(this).attr('preco');
             valores.tamanho.tamanho = $(this).attr('tamanho');
             
-            pegaBordas(cod_tamanhos);
+            //pegaBordas(cod_tamanhos);
             adicionais(<?php echo $cod_pizzarias; ?>, cod_tamanhos);
 
             //SOMA VALORES

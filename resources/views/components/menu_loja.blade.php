@@ -1,4 +1,4 @@
-<div class="header-wrap" style="border-bottom: 1px solid #CB334B;">
+<div class="header-wrap">
     <div class="site-branding">
         <a href="{{ URL::to('/') }}" class="custom-logo-link" rel="home">
             <img src="{{ asset('img/formula_pizzaria_delivery.jpg') }}" class="">
@@ -12,15 +12,15 @@
             <span class="menu-icon">
                 <i class="po po-menu-icon"></i>
             </span>
-            <span class=" screen-reader-text">Menu</span>
+            <span class=" screen-reader-text">{{ __('Menu') }}</span>
         </button>
         <div class="primary-navigation">
-            <ul id="menu-main-menu" class="menu nav-menu" aria-expanded="false" style="width: 114%;">
+            <ul id="menu-main-menu" class="menu nav-menu" aria-expanded="false" style="width: 183%;">
                 <li class="menu-item">
                     <a href="{{ URL::to('/').'/lojas' }}">{{ __('LOJAS') }}</a>
                 </li>
                 <li class="yamm-fw menu-item menu-item-has-children">
-                    <a href="about.html">CARDÁPIO</a>
+                    <a href="about.html">{{ __('CARDÁPIO') }}</a>
                     <ul class="sub-menu">
                         <li class="menu-item">
                             <div class="yamm-content">
@@ -120,6 +120,19 @@
                 </li>
                 <li class="menu-item"><a href="blog.html">BLOG</a></li>
                 <li class="menu-item"><a href="store-locator.html">CONTATO</a></li>
+                <li class="menu-item">
+                    <span id="city-phone-number-label" class="phone-number" style="font-size: 25px;color: #FFCC08;font-weight: 900;">(31) 2222-2222</span>
+                </li>
+                <li class="menu-item">
+                    <a href="cart.html">
+                        <i class="po po-scooter" style="font-size: 28px;margin-top: -5px;"></i>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ route('accounts') }}">
+                        <i class="fa fa-user" style=" font-size: 21px; "></i>
+                    </a>
+                </li>
             </ul>
         </div>
         <div class="handheld-navigation">
@@ -133,24 +146,4 @@
             </ul>
         </div>
     </nav>
-    <!-- #site-navigation -->
-    <div class="header-info-wrapper">
-        <div class="header-phone-numbers">
-            <span class="intro-text">Central</span>
-            <select class="select-city-phone-numbers" name="city-phone-numbers" id="city-phone-numbers">
-                <option value="54 548 779 654">Lourdes</option>
-                <option value="33 398 621 710">Paris</option>
-                <option value="718 54 674 021">New York</option>
-            </select>
-            <span id="city-phone-number-label" class="phone-number" style="font-size: 19px;">(31) 2222-2222</span>
-        </div>
-        <ul class="site-header-cart-v2 menu">
-            <li class="cart-content ">
-                <a href="cart.html" title="View your shopping cart">
-                    <i class="po po-scooter"></i>
-                    <span>Carrinho</span>
-                </a>
-            </li>
-        </ul>
-    </div>
 </div>

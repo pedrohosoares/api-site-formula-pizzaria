@@ -49,6 +49,8 @@ class LojaController extends Controller
         );
     }
 
+
+    
     //Página do lojista
     public function index()
     {

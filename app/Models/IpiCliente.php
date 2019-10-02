@@ -103,7 +103,7 @@ class IpiCliente extends Eloquent
 
 	public function ipi_enderecos()
 	{
-		return $this->hasMany(\App\Models\IpiEndereco::class, 'cod_clientes');
+		return $this->hasMany(\App\Models\IpiEndereco::class, 'cod_clientes','cod_clientes');
 	}
 
 	public function ipi_fidelidade_clientes()

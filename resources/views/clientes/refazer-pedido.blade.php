@@ -113,7 +113,7 @@
         <div class="col-full">
             <div class="pizzaro-breadcrumb">
                 <nav class="woocommerce-breadcrumb">
-                    <a href="{{ route('clientes') }}">Home</a>
+                    <a href="index.html">Home</a>
                     <span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
                     Pedidos
                 </nav>
@@ -121,52 +121,76 @@
             <div id="primary" class="content-area" style="width:100%;">
                 <main id="main" class="site-main">
                     <div class="entry-content">
-                        <h1>{{ __('Meus Pedidos') }} <span class="pull-right">123012 <i>{{ __('pontos') }}</i></span></h1>
+                        <h1>
+                            {{ __('Meu Pedido') }} - {{ $cod_pedido }} 
+                            <span style="float:right;">
+                                <a class="btn btn-success" href="{{ route('refazer-pedido',$cod_pedido) }}">{{ __('Refazer Pedido') }}</a>
+                            </span>
+                        </h1>
                         <hr />
                         <table class="table table-responsive">
                             <thead>
                                 <tr>
-                                    <th>{{ __('Data do Pedido') }}</th>
+                                    <th>{{ __('Campo') }}</th>
                                     <th>{{ __('Valor') }}</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th class="text-center">{{ __('Nota Fiscal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @if(!empty($pedidos))
-                                @foreach($pedidos as $pedido)
+                                @if(!empty($pedido))
                                 <tr>
+                                    <td>{{ __('Código do Pedido') }}</td>
+                                    <td>{{ $pedido->cod_pedidos }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Data e Hora do Pedido') }}</td>
                                     <td>{{ date('d/m/Y H:i:s',strtotime($pedido->data_hora_pedido)) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Valor total') }}</td>
                                     <td>{{ __('R$') }}{{ $pedido->valor_total }}</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-primary">{{ __('Repetir pedido') }}</button>
-                                    </td>
-                                    <td class="text-center">
-                                        <a class="btn btn-success" href="{{ route('pedido-completo',$pedido->cod_pedidos) }}">{{ __('Ver pedido completo') }}</a>
-                                    </td>
-                                    <td class="text-center">
-                                        <?php
-                                        $nota = json_decode($pedido->arquivo_json, true);
-                                        ?>
-                                        @if($nota['status'] == 'autorizado')
-                                        <a href="http://api.focusnfe.com.br{{ $nota['caminho_xml_nota_fiscal'] }}" target="_blank">
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Nome do cliente') }}</td>
+                                    <td>{{ $pedido->nome_cliente }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Endereço') }}</td>
+                                    <td>{{ $pedido->endereco }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Complemento') }}</td>
+                                    <td>{{ $pedido->complemento }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Edifício') }}</td>
+                                    <td>{{ $pedido->edificio }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Bairro') }}</td>
+                                    <td>{{ $pedido->bairro }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Estado') }}</td>
+                                    <td>{{ $pedido->cidade }}</td>
+                                </tr>
+                                @if($pedido->arquivo_json['status'] == 'autorizado')
+                                <tr>
+                                    <td>{{ __('CUPOM FISCAL') }}</td>
+                                    <td>
+                                        <a href="http://api.focusnfe.com.br{{ $pedido->arquivo_json['caminho_danfe'] }}" target="_blank">
                                             <i class="fa fa-qrcode notaFiscal"></i>
                                         </a>
-                                        @else
-                                        {{ __('Não disponível para download') }}
-                                        @endif
                                     </td>
                                 </tr>
-                                @endforeach
+                                @endif
                                 @else
                                 <tr>
-                                    <td colspan="5">{{ __('Nenhum pedido encontrado') }}</td>
+                                    <td colspan="2">{{ __('Nenhum dado foi encontrado') }}</td>
                                 </tr>
                                 @endif
+                                @include('clientes/pedido_ifood')
                             </tbody>
                         </table>
-                        {{ $pedidos->links() }}
                     </div>
                 </main>
             </div>

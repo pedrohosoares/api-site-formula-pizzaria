@@ -122,6 +122,6 @@ class IpiPedidosPizza extends Eloquent
 
 	public function ipi_pedidos_fracos()
 	{
-		return $this->hasMany(\App\Models\IpiPedidosFraco::class, 'cod_pedidos_pizzas');
+		return $this->hasMany(\App\Models\IpiPedidosFraco::class, 'cod_pedidos_pizzas','cod_pedidos_pizzas');
 	}
 }

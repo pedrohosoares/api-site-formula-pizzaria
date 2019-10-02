@@ -29,9 +29,17 @@ Route::name('loja')->group(function(){
     Route::match(['post','get'],'/lojas/{state}/{name}/sobremesas','LojaController@sobremesas')->name('sobremesas');
 });
 
-Route::get('/accounts','ClienteController@accounts')->name('accounts');
+Route::get('/clientes/login','ClienteController@user')->name('login');
 Route::get('/clientes/user','ClienteController@user')->name('user');
-Route::get('/clientes/account','ClienteController@account')->name('account');
+Route::match(['post','get'],'/clientes/accounts','ClienteController@account')->name('accounts');
+Route::match(['post','get'],'/clientes/account','ClienteController@account')->name('account');
+Route::get('/clientes/contact','ClienteController@contact')->name('contact');
+Route::get('/clientes/logout','ClienteController@logout')->name('logout');
+Route::get('/clientes/pedido-completo/{cod_pedido}','ClienteController@pedidoCompleto')->name('pedido-completo');
+Route::get('/clientes/refazer-pedido/{cod_pedido}','ClienteController@refazerPedido')->name('refazer-pedido');
+Route::get('/clientes','ClienteController@clientes')->name('clientes');
+
+
 
 Route::get('/getTamanhos/{quantidade?}/{situacao?}','TamanhoController@getTamanhos')->name('getTamanhos');
 Route::get('/getBebidas/','BebidaController@getBebidas')->name('getBebidas');

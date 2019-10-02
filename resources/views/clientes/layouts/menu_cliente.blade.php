@@ -53,18 +53,23 @@
                 <div class="primary-navigation" style="text-align:right;">
                     <ul id="menu-main-menu" class="menu nav-menu" aria-expanded="false">
                         <li class="menu-item">
-                            <a href="cart.html">
+                            <a href="{{ route('user') }}">
                                 <i class="po po-scooter" style="font-size: 28px;margin-top: -5px;"></i>
                                 <span>{{ __('Meus Pedidos') }}</span>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="{{ route('accounts') }}">
+                            <a href="{{ route('account') }}">
                                 <i class="fa fa-user" style=" font-size: 21px; "></i>
                                 <span>{{ __('Minha conta') }}</span>
                             </a>
                         </li>
-                        <li class="menu-item"><a href="store-locator.html">{{ __('Contato') }}</a></li>
+                        <li class="menu-item">
+                            <a href="{{ route('contact') }}">{{ __('Contato') }}</a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('logout') }}">{{ __('Logout') }}</a>
+                        </li>
                     </ul>
                 </div>
                 <div class="handheld-navigation">

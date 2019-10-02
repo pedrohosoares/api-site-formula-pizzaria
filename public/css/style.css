@@ -10231,6 +10231,7 @@ article.post {
     position:fixed;
     top:0;
     height: 107px;
+    width:100%;
   }
 }
 

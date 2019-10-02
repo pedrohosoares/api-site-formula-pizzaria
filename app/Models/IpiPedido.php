@@ -122,8 +122,8 @@ class IpiPedido extends Eloquent
 		'ifood' => 'bool',
 		'integracao_ecf' => 'int',
 		'arquivo_json' => 'json',
-		'cancelamento_json' => 'json',
-		'pedido_ifood_json' => 'json'
+		'cancelamento_json' => 'json'
+		#'pedido_ifood_json' => 'json'
 	];
 
 	protected $dates = [
@@ -222,7 +222,7 @@ class IpiPedido extends Eloquent
 
 	public function ipi_pedidos_bebidas()
 	{
-		return $this->hasMany(\App\Models\IpiPedidosBebida::class, 'cod_pedidos');
+		return $this->hasMany(\App\Models\IpiPedidosBebida::class, 'cod_pedidos','cod_pedidos');
 	}
 
 	public function ipi_pedidos_detalhes_pgs()

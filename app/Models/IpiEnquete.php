@@ -33,7 +33,7 @@ class IpiEnquete extends Eloquent
 
 	public function ipi_enquete_perguntas()
 	{
-		return $this->hasMany(\App\Models\IpiEnquetePergunta::class, 'cod_enquetes');
+		return $this->hasMany(\App\Models\IpiEnquetePergunta::class, 'cod_enquetes','cod_enquetes');
 	}
 
 	public function ipi_pedidos()

@@ -292,12 +292,21 @@ legend {
 textarea {
   overflow: auto; }
 
+  .panel-red>.panel-heading{
+  background:#C00A27;
+  border-color:#C00A27;
+  color:#FFF;
+}
 /**
  * Don't inherit the `font-weight` (applied by a rule above).
  * NOTE: the default cannot safely be changed in Chrome and Safari on OS X.
  */
 optgroup {
   font-weight: bold; }
+
+.borderRadius{
+  border-radius:50px;
+}
 
 /* Tables
    ========================================================================== */

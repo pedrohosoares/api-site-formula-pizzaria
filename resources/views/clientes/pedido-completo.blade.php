@@ -126,7 +126,7 @@
                         <h1>
                             {{ __('Meu Pedido') }} - {{ $cod_pedido }}
                             <span style="float:right;">
-                                <a class="btn btn-success" href="{{ route('refazer-pedido',$cod_pedido) }}">{{ __('Refazer Pedido') }}</a>
+                                <a class="btn btn-primary" href="{{ route('refazer-pedido',$cod_pedido) }}">{{ __('Repedir Pedido') }}</a>
                             </span>
                         </h1>
                         <hr />
@@ -197,6 +197,7 @@
                                 @endif
                             </tbody>
                         </table>
+                        @include('components/enquete')
                     </div>
                 </main>
             </div>

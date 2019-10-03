@@ -35,6 +35,7 @@ use Reliese\Database\Eloquent\Model as Eloquent;
  */
 class IpiEndereco extends Eloquent
 {
+	protected $primaryKey = 'cod_enderecos';
 	public $timestamps = false;
 
 	protected $casts = [

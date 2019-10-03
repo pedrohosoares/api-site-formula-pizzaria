@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 use Illuminate\Pagination\Paginator;
 
+use App\Models\IpiPedido;
 
 class Controller extends BaseController
 {
@@ -109,6 +110,11 @@ class Controller extends BaseController
             ->leftJoin('ipi_ingredientes_ipi_pizzas', 'ipi_ingredientes_ipi_pizzas.cod_ingredientes', 'ipi_ingredientes.cod_ingredientes')
             ->where('ipi_ingredientes_ipi_pizzas.cod_pizzas', $cod_pizzas)
             ->get();
+    }
+
+
+    public function getPedido($cod_pedido,$cod_clientes){
+        return IpiPedido::where('cod_pedidos', $cod_pedido)->where('cod_clientes', $this->cod_clientes)->first();
     }
 
 

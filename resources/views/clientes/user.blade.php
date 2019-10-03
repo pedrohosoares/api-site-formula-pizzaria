@@ -140,7 +140,7 @@
                                     <td>{{ date('d/m/Y H:i:s',strtotime($pedido->data_hora_pedido)) }}</td>
                                     <td>{{ __('R$') }}{{ $pedido->valor_total }}</td>
                                     <td class="text-center">
-                                        <button class="btn btn-primary">{{ __('Repetir pedido') }}</button>
+                                        <a class="btn btn-primary" href="{{ route('refazer-pedido',$pedido->cod_pedidos) }}">{{ __('Repetir pedido') }}</a>
                                     </td>
                                     <td class="text-center">
                                         <a class="btn btn-success" href="{{ route('pedido-completo',$pedido->cod_pedidos) }}">{{ __('Ver pedido completo') }}</a>

@@ -30,11 +30,13 @@ use Reliese\Database\Eloquent\Model as Eloquent;
  */
 class IpiClientesRedesSociai extends Eloquent
 {
+	protected $primaryKey = 'cod_clientes_redes_sociais';
 	public $incrementing = false;
 	public $timestamps = false;
 
 	protected $casts = [
-		'cod_clientes' => 'int'
+		'cod_clientes' => 'int',
+		'cod_clientes_redes_sociais'=>'int'
 	];
 
 	protected $dates = [
@@ -44,6 +46,7 @@ class IpiClientesRedesSociai extends Eloquent
 
 	protected $fillable = [
 		'cod_clientes',
+		'cod_clientes_redes_sociais',
 		'nome_site',
 		'url_cliente_site',
 		'hash_acesso_cliente_site',

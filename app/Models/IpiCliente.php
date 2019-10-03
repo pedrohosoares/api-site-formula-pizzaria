@@ -93,7 +93,7 @@ class IpiCliente extends Eloquent
 
 	public function ipi_clientes_redes_sociai()
 	{
-		return $this->hasOne(\App\Models\IpiClientesRedesSociai::class, 'cod_clientes');
+		return $this->hasMany(\App\Models\IpiClientesRedesSociai::class, 'cod_clientes');
 	}
 
 	public function ipi_email_automaticos()

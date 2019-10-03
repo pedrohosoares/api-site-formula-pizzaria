@@ -102,10 +102,6 @@
             -webkit-transform: rotate(359deg);
         }
     }
-
-    .notaFiscal {
-        font-size: 43px;
-    }
 </style>
 <div id="page" class="hfeed site">
     @include('clientes.layouts.menu_cliente')
@@ -114,18 +110,19 @@
             <div class="pizzaro-breadcrumb">
                 <nav class="woocommerce-breadcrumb">
                     <a href="{{ route('clientes') }}">Home</a>
-                    <span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
-                    {{ __('Refazer Pedido') }}
                 </nav>
             </div>
             <div id="primary" class="content-area" style="width:100%;">
                 <main id="main" class="site-main">
                     <div class="entry-content">
-                        <h1>
-                            {{ __('Refazer Pedido') }} - {{ $cod_pedido }} 
-                        </h1>
+                        <h1>{{ __('Home') }}</h1>
                         <hr />
-                        @include('components/bloco_refazer_pedido')
+                        <div class="col-md-12">
+                            <figure>
+                                <img />
+                            </figure>
+                            <br />
+                        </div>
                     </div>
                 </main>
             </div>

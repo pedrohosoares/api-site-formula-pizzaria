@@ -121,7 +121,7 @@ class IpiPedido extends Eloquent
 		'impressao_cancelado' => 'int',
 		'ifood' => 'bool',
 		'integracao_ecf' => 'int',
-		'arquivo_json' => 'json',
+		#'arquivo_json' => 'json',
 		'cancelamento_json' => 'json'
 		#'pedido_ifood_json' => 'json'
 	];

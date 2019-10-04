@@ -115,6 +115,10 @@
                 <nav class="woocommerce-breadcrumb">
                     <a href="{{ route('clientes') }}">Home</a>
                     <span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
+                    <a href="{{ route('user') }}">{{ __('Pedidos') }}</a>
+                    <span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
+                    <a href="{{ route('pedido-completo',$cod_pedido) }}">{{ __('Pedidos') }} N° {{ $cod_pedido }}</a>
+                    <span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
                     {{ __('Refazer Pedido') }}
                 </nav>
             </div>

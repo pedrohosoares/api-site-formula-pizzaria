@@ -108,7 +108,13 @@
     <div id="content" class="site-content" tabindex="-1">
         <div class="col-full">
             <div class="pizzaro-breadcrumb">
-                <nav class="woocommerce-breadcrumb"><a href="index.html">Home</a><span class="delimiter"><i class="po po-arrow-right-slider"></i></span>My Account</nav>
+                <nav class="woocommerce-breadcrumb">
+                    <a href="index.html">Home</a>
+                    <span class="delimiter">
+                        <i class="po po-arrow-right-slider"></i>
+                    </span>
+                    {{ __('Login') }}
+                </nav>
             </div>
             <div id="primary" class="content-area" style="width:100%;">
                 <main id="main" class="site-main">
@@ -118,23 +124,27 @@
                                 <div class="u-columns col2-set" id="customer_login">
                                     <div class="u-column1 col-1" style="width: 49.99999%;float: left;">
                                         <h2>{{ __('Login / Cadastre-se') }}</h2>
-                                        <form class="login">
+                                        <form class="login" method="POST" action="{{ route('login') }}">
+                                            @csrf
                                             <p class="before-login-text">{{ __('Bem vindo, faça seu login abaixo:') }}</p>
+                                            @if(!empty($mensagem))
+                                                <div class="alert alert-success">
+                                                    <p>{{ $mensagem }}</p>
+                                                </div>
+                                            @endif
                                             <p class="woocommerce-FormRow woocommerce-FormRow--wide form-row form-row-wide">
-                                                <label for="username">{{ __('Username ou e-mail') }} 
+                                                <label for="username">{{ __('Username ou e-mail') }}
                                                     <span class="required">*</span>
                                                 </label>
-                                                <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="username" id="username" value="">
+                                                <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="email" id="username" value="">
                                             </p>
                                             <p class="woocommerce-FormRow woocommerce-FormRow--wide form-row form-row-wide">
-                                                <label for="password"> {{ __('Password') }} 
+                                                <label for="password"> {{ __('Password') }}
                                                     <span class="required">*</span>
                                                 </label>
-                                                <input class="woocommerce-Input woocommerce-Input--text input-text" type="password" name="password" id="password">
+                                                <input class="woocommerce-Input woocommerce-Input--text input-text" type="password" name="senha" id="password">
                                             </p>
                                             <p class="form-row">
-                                                <input type="hidden" id="woocommerce-login-nonce" name="woocommerce-login-nonce" value="02aaeb6b10">
-                                                <input type="hidden" name="_wp_http_referer" value="/pizzaro/my-account/">
                                                 <input type="submit" class="woocommerce-Button button" name="login" value="Login">
                                             </p>
                                             <p class="woocommerce-LostPassword lost_password">
@@ -143,6 +153,7 @@
                                             <div class="register-benefits">
                                                 <h3>{{ __('Seja um usuário cadastrado da Fórmula Pizzaria') }}</h3>
                                                 <ul>
+                                                    <li>{{ __('Pré-lançamentos') }}</li>
                                                     <li>{{ __('Promoções exclusivas') }}</li>
                                                     <li>{{ __('Bônus nos pedidos') }}</li>
                                                     <li>{{ __('Vantagens e brindes') }}</li>

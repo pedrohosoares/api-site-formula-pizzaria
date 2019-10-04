@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\IpiCliente;
 use App\Models\IpiClientesBloqueio;
@@ -131,10 +132,26 @@ class ClienteController extends Controller
         }
     }
 
+    
+    public function login(Request $request){
+        $mensagem = '';
+        if($request->isMethod('POST')){
+            $dados = $request->only('email','senha');
+            //$dados['senha'] = Hash::make($dados['senha']);
+            #$cliente = IpiCliente::where('email',$dados['email'])->first();
+            #Hash::check($dados['senha'],$cliente->senha);
+            if(Auth::attempt($dados)){
+                dd("asassa");
+            }else{
+                $mensagem = __('Login/Senha errôneos');
+            }
+        }
+        return view('clientes.login',['mensagem'=>$mensagem]);
+    }
 
     public function user()
     {
-        $pedidos = Controller::selectPedidosCliente($this->cod_clientes);
+        $pedidos = IpiPedido::where('cod_clientes',$this->cod_clientes)->paginate(6);
         return view('clientes.user', ['pedidos' => $pedidos]);
     }
 

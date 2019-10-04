@@ -130,6 +130,7 @@
                                     <th>{{ __('Valor') }}</th>
                                     <th></th>
                                     <th></th>
+                                    <th></th>
                                     <th class="text-center">{{ __('Nota Fiscal') }}</th>
                                 </tr>
                             </thead>
@@ -139,6 +140,26 @@
                                 <tr>
                                     <td>{{ date('d/m/Y H:i:s',strtotime($pedido->data_hora_pedido)) }}</td>
                                     <td>{{ __('R$') }}{{ $pedido->valor_total }}</td>
+                                    <td style="font-size:13px;">
+                                        @if($pedido->origem_pedido == 'IFOOD')
+                                            
+                                        @else
+                                            @if($pedido->ipi_pedidos_pizzas->count() > 0)
+                                                @foreach($pedido->ipi_pedidos_pizzas as $pizzas)
+                                                    @foreach($pizzas->ipi_pedidos_fracos as $fracoes)
+                                                            {{ __('Tamanho: ') }} {{ $pizzas->ipi_tamanho->tamanho }} | {{ __('Quantidade de Sabores: ').$pizzas->quant_fracao }}
+                                                            {{ $fracoes->ipi_pizza->pizza }} - {{ $fracoes->ipi_pizza->tipo }}
+                                                    @endforeach
+                                                @endforeach
+                                            @endif
+                                            @if($pedido->ipi_pedidos_bebidas->count() > 0)
+                                                @foreach($pedido->ipi_pedidos_bebidas as $bebidas)
+                                                    # {{ $bebidas->quantidade }} - {{ $bebidas->ipi_bebidas_ipi_conteudo->ipi_bebida->bebida }} 
+                                                    {{ $bebidas->ipi_bebidas_ipi_conteudo->ipi_conteudo->conteudo }}
+                                                @endforeach
+                                            @endif
+                                        @endif
+                                    </td>
                                     <td class="text-center">
                                         <a class="btn btn-primary" href="{{ route('refazer-pedido',$pedido->cod_pedidos) }}">{{ __('Repetir pedido') }}</a>
                                     </td>
@@ -149,7 +170,7 @@
                                         <?php
                                         $nota = json_decode($pedido->arquivo_json, true);
                                         ?>
-                                        @if($nota['status'] == 'autorizado')
+                                        @if(!empty($nota) and isset($nota['caminho_xml_nota_fiscal']))
                                         <a href="http://api.focusnfe.com.br{{ $nota['caminho_xml_nota_fiscal'] }}" target="_blank">
                                             <i class="fa fa-qrcode notaFiscal"></i>
                                         </a>

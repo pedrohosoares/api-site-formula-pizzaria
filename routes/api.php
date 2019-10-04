@@ -23,6 +23,11 @@ Route::get('/peddings/new/{token}/{status}','PedidoController@peddingNew');
 Route::get('/peddings/reprint/{token}','PedidoController@peddingReprint');
 Route::get('/peddings/cancel/{token}','PedidoController@peddingCancel');
 
+Route::get('/bebidas/{token}','Controller@peddingCancel');
+Route::get('/sobremesas/{token}','PedidoController@peddingCancel');
+Route::get('/pizzas/{token}','PedidoController@peddingCancel');
+Route::get('/calzones/{token}','PedidoController@peddingCancel');
+
 //ROTAS DE ATUALIZACAO DE PEDIDOS
 Route::get('/peddings/sendStatus/{token}/{field}/{status}/{id}','PedidoController@sendStatus');
 

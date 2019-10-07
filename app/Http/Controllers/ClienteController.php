@@ -38,6 +38,7 @@ use App\Models\IpiCaixaIpiPedido;
 use App\Models\IpiEndereco;
 use App\Models\IpiEnquete;
 use App\Models\IpiEnquetePergunta;
+use App\Models\IpiTamanho;
 
 use View;
 
@@ -171,8 +172,19 @@ class ClienteController extends Controller
     { 
         $cod_pedido = $request->route('cod_pedido');
         $pedido = Controller::getPedido($cod_pedido,$this->cod_clientes);
-        
-        return view('clientes.refazer-pedido',['cod_pedido' => $cod_pedido,'pedido'=>$pedido]);
+        $tamanhos = Controller::getTamanhos();
+        $borda = Controller::getBorda();
+        $tipoMassa = Controller::getTipoMassa();
+        $opcoesCorte = Controller::getOpcoesCorte();
+        return view('clientes.refazer-pedido',[
+            'cod_pedido' => $cod_pedido,
+            'pedido'=>$pedido,
+            'tamanhos'=>$tamanhos,
+            'borda'=>$borda,
+            'tipo_massa'=>$tipoMassa,
+            'opcoes_corte'=>$opcoesCorte
+            ]
+        );
     }
 
     public function logout()

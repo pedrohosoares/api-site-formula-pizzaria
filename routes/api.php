@@ -23,6 +23,12 @@ Route::get('/peddings/new/{token}/{status}','PedidoController@peddingNew');
 Route::get('/peddings/reprint/{token}','PedidoController@peddingReprint');
 Route::get('/peddings/cancel/{token}','PedidoController@peddingCancel');
 
+Route::get('/pegatodasbordas/{cod_pizzarias}','Controller@pegatodasbordas')->name('apipegatodasbordas');
+Route::get('/pegatodaspizzas/{cod_pizzarias}','Controller@buscaSemGroupPizzas')->name('apipegatodaspizzas');
+Route::get('/pegatodasbebidas/{cod_pizzarias}','Controller@selecaoBebidas')->name('apipegatodasbebidas');
+Route::get('/buscaIngredientes/{cod_pizzarias}/{cod_tamanho}/{cod_pizza}','Controller@buscaIngredientes')->name('apibuscaIngredientes');
+Route::get('/pegatodosadicionais/{cod_pizzarias}','Controller@selectIngredientesAdicionais')->name('apipegatodosadicionais');
+
 Route::get('/bebidas/{token}','Controller@peddingCancel');
 Route::get('/sobremesas/{token}','PedidoController@peddingCancel');
 Route::get('/pizzas/{token}','PedidoController@peddingCancel');

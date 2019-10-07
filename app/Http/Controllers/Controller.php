@@ -9,9 +9,11 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 use Illuminate\Support\Facades\DB;
 
-use Illuminate\Pagination\Paginator;
-
+use App\Models\IpiBorda;
 use App\Models\IpiPedido;
+use App\Models\IpiTamanho;
+use App\Models\IpiTipoMassa;
+use App\Models\IpiOpcoesCorte;
 
 class Controller extends BaseController
 {
@@ -33,7 +35,7 @@ class Controller extends BaseController
     public function buscaPizzas($cod_pizzarias, $whereNotIn = null, $where = null)
     {
         $busca = DB::table('ipi_pizzas')
-            ->select(['ipi_pizzas.cod_pizzas', 'ipi_pizzas.foto_grande', 'ipi_pizzas.pizza', 'ipi_pizzas_ipi_tamanhos.preco', 'ipi_tamanhos.tamanho'])
+            ->select(['ipi_pizzas.cod_pizzas', 'ipi_pizzas.foto_grande', 'ipi_pizzas.pizza', 'ipi_pizzas_ipi_tamanhos.preco', 'ipi_tamanhos.cod_tamanhos','ipi_tamanhos.tamanho'])
             ->leftJoin('ipi_tipo_pizza', 'ipi_pizzas.cod_tipo_pizza', 'ipi_tipo_pizza.cod_tipo_pizza')
             ->join('ipi_pizzas_ipi_tamanhos', 'ipi_pizzas.cod_pizzas', 'ipi_pizzas_ipi_tamanhos.cod_pizzas')
             ->leftJoin('ipi_tamanhos', 'ipi_pizzas_ipi_tamanhos.cod_tamanhos', 'ipi_tamanhos.cod_tamanhos')
@@ -48,7 +50,33 @@ class Controller extends BaseController
         return $busca;
     }
 
-    public function escolherBebidas($cod_pizzarias, $whereNotIn = null, $whereIn = null)
+
+    
+    public function buscaSemGroupPizzas($cod_pizzarias)
+    {
+        $busca = DB::table('ipi_pizzas')
+            ->select(['ipi_pizzas.cod_pizzas','ipi_pizzas.foto_grande', 'ipi_pizzas.pizza', 'ipi_pizzas_ipi_tamanhos.preco', 'ipi_tamanhos.cod_tamanhos','ipi_tamanhos.tamanho'])
+            ->leftJoin('ipi_tipo_pizza', 'ipi_pizzas.cod_tipo_pizza', 'ipi_tipo_pizza.cod_tipo_pizza')
+            ->join('ipi_pizzas_ipi_tamanhos', 'ipi_pizzas.cod_pizzas', 'ipi_pizzas_ipi_tamanhos.cod_pizzas')
+            ->leftJoin('ipi_tamanhos', 'ipi_pizzas_ipi_tamanhos.cod_tamanhos', 'ipi_tamanhos.cod_tamanhos')
+            ->where('ipi_pizzas_ipi_tamanhos.cod_pizzarias', $cod_pizzarias);
+        $busca = $busca->get();
+        return $busca;
+    }
+
+    public function buscaIngredientes($cod_pizzaria,$cod_tamanhos,$cod_pizza){
+        return DB::table('ipi_ingredientes_ipi_tamanhos')
+        ->select(['ipi_ingredientes_ipi_tamanhos.preco','ipi_ingredientes_ipi_pizzas.cod_pizzas','ipi_ingredientes.ingrediente','ipi_ingredientes.cod_ingredientes'])
+        ->leftJoin('ipi_ingredientes', 'ipi_ingredientes.cod_ingredientes', 'ipi_ingredientes_ipi_tamanhos.cod_ingredientes')
+        ->leftJoin('ipi_ingredientes_ipi_pizzas', 'ipi_ingredientes_ipi_pizzas.cod_ingredientes', 'ipi_ingredientes.cod_ingredientes')
+        ->where('ipi_ingredientes_ipi_tamanhos.cod_pizzarias',$cod_pizzaria)
+        ->where('ipi_ingredientes_ipi_tamanhos.cod_tamanhos',$cod_tamanhos)
+        ->where('ipi_ingredientes_ipi_pizzas.cod_pizzas',$cod_pizza)
+        ->get();
+    }
+    
+
+    public function escolherBebidas($cod_pizzarias)
     {
         //Por as clausulas whereIn e whereNotIn
         return DB::table('ipi_bebidas')
@@ -112,11 +140,37 @@ class Controller extends BaseController
             ->get();
     }
 
+    public function pegatodasbordas($cod_pizzarias){
+        return DB::table('ipi_bordas')
+        ->select(['ipi_bordas.cod_bordas','ipi_bordas.borda','ipi_bordas.cod_ingredientes','ipi_bordas.cod_bordas','ipi_tamanhos_ipi_bordas.cod_bordas','ipi_tamanhos_ipi_bordas.preco','ipi_tamanhos_ipi_bordas.cod_tamanhos'])
+        ->leftJoin('ipi_tamanhos_ipi_bordas','ipi_bordas.cod_bordas','ipi_tamanhos_ipi_bordas.cod_bordas')
+        ->where('ipi_tamanhos_ipi_bordas.cod_pizzarias',$cod_pizzarias)
+        ->get();
+    }
 
     public function getPedido($cod_pedido,$cod_clientes){
         return IpiPedido::where('cod_pedidos', $cod_pedido)->where('cod_clientes', $this->cod_clientes)->first();
     }
+    
+    public function getTamanhos(){
+        return IpiTamanho::get();
+    }
 
+    public function getBorda(){
+        return IpiBorda::get();
+    }
+
+    public function getTipoMassa(){
+        return IpiTipoMassa::get();
+    }
+
+    public function getOpcoesCorte(){
+        return IpiOpcoesCorte::get();
+    }
+
+    public function getIngredientes(){
+
+    }
 
     public function selectPedidosCliente($cod_clientes)
     {
@@ -148,9 +202,9 @@ class Controller extends BaseController
     public function selectIngredientesAdicionais($cod_pizzaria, $cod_tamanhos)
     {
         return DB::table('ipi_ingredientes')
-            ->select(['ipi_ingredientes_ipi_tamanhos.preco', 'ipi_ingredientes_ipi_tamanhos.cod_ingredientes', 'ipi_ingredientes.ingrediente'])
+            ->select(['ipi_ingredientes_ipi_tamanhos.cod_tamanhos','ipi_ingredientes_ipi_tamanhos.cod_pizzarias','ipi_ingredientes_ipi_tamanhos.preco', 'ipi_ingredientes_ipi_tamanhos.cod_ingredientes', 'ipi_ingredientes.ingrediente'])
             ->leftJoin('ipi_ingredientes_ipi_tamanhos', 'ipi_ingredientes.cod_ingredientes', 'ipi_ingredientes_ipi_tamanhos.cod_ingredientes')
-            ->where('ipi_ingredientes_ipi_tamanhos.cod_tamanhos', $cod_tamanhos)
+            ->where('ipi_ingredientes_ipi_tamanhos.cod_tamanhos','LIKE', '%'.$cod_tamanhos)
             ->where('ipi_ingredientes_ipi_tamanhos.cod_pizzarias', $cod_pizzaria)
             ->get();
     }

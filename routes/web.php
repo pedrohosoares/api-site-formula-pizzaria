@@ -44,6 +44,7 @@ Route::match(['post', 'get'],'/clientes/login', 'ClienteController@login')->name
     Route::match(['post', 'get'], '/ajaxPesquisaPedido', 'ClienteController@ajaxPesquisaPedido')->name('ajaxPesquisaPedido');
 //});
 
+Route::match(['post', 'get'], '/{id_cliente}/meu-pedido/{id_pedido}', 'ClienteController@compartilharpedido')->name('compartilharpedido');
 
 Route::get('/getTamanhos/{quantidade?}/{situacao?}', 'TamanhoController@getTamanhos')->name('getTamanhos');
 Route::get('/getBebidas/', 'BebidaController@getBebidas')->name('getBebidas');

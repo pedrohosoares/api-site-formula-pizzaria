@@ -165,7 +165,7 @@ class ClienteController extends Controller
         if (empty($pedido->pedido_ifood_json)) {
             $pedidoSistema = IpiPedido::find($cod_pedido);
         }
-        return view('clientes.pedido-completo', ['enquete'=>$enquete,'pedido' => $pedido, 'cod_pedido' => $cod_pedido, 'pedidos_sistema' => $pedidoSistema]);
+        return view('clientes.pedido-completo', ['enquete'=>$enquete,'cod_cliente'=>$this->cod_clientes,'pedido' => $pedido, 'cod_pedido' => $cod_pedido, 'pedidos_sistema' => $pedidoSistema]);
     }
 
     public function refazerPedido(Request $request)
@@ -176,15 +176,23 @@ class ClienteController extends Controller
         $borda = Controller::getBorda();
         $tipoMassa = Controller::getTipoMassa();
         $opcoesCorte = Controller::getOpcoesCorte();
+        $bebidas = Controller::selecaoBebidas($pedido->cod_pizzarias,[8]);
+        $sobremesas = Controller::selecaoBebidas($pedido->cod_pizzarias,[1,2,3,4,5,6,7,9]);
         return view('clientes.refazer-pedido',[
             'cod_pedido' => $cod_pedido,
             'pedido'=>$pedido,
             'tamanhos'=>$tamanhos,
             'borda'=>$borda,
             'tipo_massa'=>$tipoMassa,
-            'opcoes_corte'=>$opcoesCorte
+            'opcoes_corte'=>$opcoesCorte,
+            'bebidas'=>$bebidas,
+            'sobremesas'=>$sobremesas
             ]
         );
+    }
+
+    public function compartilharpedido(){
+
     }
 
     public function logout()

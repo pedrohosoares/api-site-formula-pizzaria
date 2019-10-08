@@ -109,9 +109,11 @@
         <div class="col-full">
             <div class="pizzaro-breadcrumb">
                 <nav class="woocommerce-breadcrumb">
-                    <a href="{{ route('clientes') }}">Home</a>
-                    <span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
-                    {{ __('Minha Conta') }}
+                    <div class="pull-left">
+                        <a href="{{ route('clientes') }}">Home</a>
+                        <span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
+                        {{ __('Minha Conta') }}
+                    </div>
                 </nav>
             </div>
             <div id="primary" class="content-area" style="width:100%;">
@@ -214,7 +216,7 @@
                                 <div class="col-md-6">
                                     <label for="" class="col-sm-12 control-label">{{ __('Cep') }}</label>
                                     <div class="col-sm-10">
-                                        <input type="text" maxlength="8"required title="{{ __('O Cep é obrigatório') }}" name="ipi_enderecos[cep]" value="{{ isset($endereco[0]->cep)?$endereco[0]->cep:'' }}" class="form-control" placeholder="{{ __('Cep') }}">
+                                        <input type="text" maxlength="8" required title="{{ __('O Cep é obrigatório') }}" name="ipi_enderecos[cep]" value="{{ isset($endereco[0]->cep)?$endereco[0]->cep:'' }}" class="form-control" placeholder="{{ __('Cep') }}">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -263,7 +265,7 @@
                                     <label for="" class="col-sm-12 control-label">{{ __('Complemento') }}</label>
                                     <div class="col-sm-11">
                                         <textarea name="ipi_enderecos[complemento]" value="{{ isset($endereco[0]->complemento)?$endereco[0]->complemento:'' }}" class="form-control borderRadius" placeholder="{{ __('complemento') }}">
-                                            {{ isset($endereco[0]->complemento)?$endereco[0]->complemento:'' }}
+                                        {{ isset($endereco[0]->complemento)?$endereco[0]->complemento:'' }}
                                         </textarea>
                                     </div>
                                 </div>
@@ -286,19 +288,20 @@
 <script src="{{ asset('js/jquery.mask.js') }}"></script>
 <script>
     $(function() {
+
         $('input[name="ipi_clientes[cpf]"]').mask('999.999.999-99');
         $('input[name="ipi_clientes[celular]"]').mask('(99)99999-9999');
         $('input[name="ipi_clientes[nascimento]"]').mask('99/99/9999');
         $('input[name="ipi_enderecos[telefone_1]"],input[name="ipi_enderecos[telefone_2]"]').mask('(99)9999-9999');
         $('input[name="ipi_enderecos[cep]"]').mask('0#');
         $('input[name="ipi_enderecos[numero]"]').mask('0#');
-        $('input[name="ipi_enderecos[cep]"]').keyup(function(){
-            if($(this).val().length == 8){
+        $('input[name="ipi_enderecos[cep]"]').keyup(function() {
+            if ($(this).val().length == 8) {
                 $.ajax({
-                    url:'https://viacep.com.br/ws/'+$(this).val()+'/json/',
-                    dataType:"JSON",
-                    type:"GET",
-                    complete:function(r){
+                    url: 'https://viacep.com.br/ws/' + $(this).val() + '/json/',
+                    dataType: "JSON",
+                    type: "GET",
+                    complete: function(r) {
                         let json = r.responseJSON;
                         $('input[name="ipi_enderecos[estado]"]').val(json.uf);
                         $('input[name="ipi_enderecos[endereco]"]').val(json.logradouro);

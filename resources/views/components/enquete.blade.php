@@ -2,7 +2,7 @@
 <h2>{{ __('Diga sua opinião sobre nossos serviços e seja premiado.') }}</h2>
 <hr />
 @foreach($enquete->ipi_enquete_perguntas as $p)
-<div class="panel panel-red">
+<div class="panel panel-red" style="cursor:pointer;">
     <div class="panel-heading">{{ __($p->pergunta) }}</div>
     <div class="panel-body" aberto="nao" style="display:none;cursor:pointer;">
         @foreach($p->ipi_enquete_respostas as $enquete)

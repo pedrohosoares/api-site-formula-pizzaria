@@ -113,11 +113,35 @@
         <div class="col-full">
             <div class="pizzaro-breadcrumb">
                 <nav class="woocommerce-breadcrumb">
-                    <a href="{{ route('clientes') }}">Home</a>
-                    <span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
-                    <a href="{{ route('user') }}">{{ __('Pedidos') }}</a>
-                    <span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
-                    {{ __('Pedido N°') }} {{ $cod_pedido }}
+                    <div class="pull-left">
+
+                        <a href="{{ route('clientes') }}">Home</a>
+                        <span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
+                        <a href="{{ route('user') }}">{{ __('Pedidos') }}</a>
+                        <span class="delimiter"><i class="po po-arrow-right-slider"></i></span>
+                        {{ __('Pedido N°') }} {{ $cod_pedido }}
+
+                    </div>
+                    <div class="pull-right">
+                        <div style=" margin-top: 9px; float: left; margin-right: 15px; ">
+                            <strong>{{ __('Compartilhe e ganhe outro pedido!') }}</strong>
+                        </div>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ URL::to('/').'/'.$cod_cliente.'/meu-pedido/'.$cod_pedido }}" data-toggle="tooltip" data-placement="top" title="{{ __('Compartilhe no Facebook') }}">
+                            <img class="redes_sociais" src="{{ asset('img').'/facebook-compartilhar-formula-pizzaria.png' }}" />
+                        </a>
+                        <a href="https://pinterest.com/pin/create/button/?url={{ URL::to('/').'/'.$cod_cliente.'/meu-pedido/'.$cod_pedido }}&media=&description=As pizzas, calzones e sanduíches mais gostosos!!!! #FórmulaPizzaria" data-toggle="tooltip" data-placement="top" title="{{ __('Compartilhe no Pinterest') }}">
+                            <img class="redes_sociais" src="{{ asset('img').'/pinteressest-formula-pizzaria.png' }}" />
+                        </a>
+                        <a href="https://twitter.com/home?status=https://{{ URL::to('/').'/'.$cod_cliente.'/meu-pedido/'.$cod_pedido }} Olha que delícia eu acabei de pedir! #FórmulaPizzaria" data-toggle="tooltip" data-placement="top" title="{{ __('Compartilhe no Twitter') }}">
+                            <img class="redes_sociais" src="{{ asset('img').'/twitter-formula-pizzaria.png' }}" />
+                        </a>
+                        <a href="https://api.whatsapp.com/send?text=Olha que delícia que eu pedi! Pensei que você também poderia querer. {{ URL::to('/').'/'.$cod_cliente.'/meu-pedido/'.$cod_pedido }}" data-toggle="tooltip" data-placement="top" title="{{ __('Compartilhe no WhatsApp') }}">
+                            <img class="redes_sociais" src="{{ asset('img').'/whatsapp-formula-pizzaria-compartilhar.png' }}" />
+                        </a>
+                        <a href="#" data-toggle="tooltip" class="qrcodeLink" data-placement="top" title="{{ __('Copie esse link com nosso QrCode') }}">
+                            <i style=" font-size: 44px; " class="fa fa-qrcode notaFiscal"></i>
+                        </a>
+                    </div>
                 </nav>
             </div>
             <div id="primary" class="content-area" style="width:100%;">
@@ -204,5 +228,34 @@
         </div>
     </div>
 </div>
+<div class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">{{ __('Copie o link dessa página para o seu celular') }}</h4>
+            </div>
+            <div class="modal-body">
+                <p class="text-center">
+                    {!! QrCode::size(300)->generate(Request::url()) !!}
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Fechar') }}</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<script>
+    $(function() {
+        const modal = function(alvo) {
+            $(alvo).click(function(e) {
+                e.preventDefault();
+                $('.modal').modal('show');
+            });
+        }
+        modal('.qrcodeLink');
+    });
+</script>
 @include('components.mapa')
 @include('layouts.footer')

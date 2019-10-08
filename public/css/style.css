@@ -2393,6 +2393,9 @@ td, th {
   overflow: visible;
   clip: auto; }
 
+.woocommerce-breadcrumb a img.redes_sociais {
+    width: 37px;
+}
 /**
  * Global styles applied to ecommerce template components. Includes styles for;
  *

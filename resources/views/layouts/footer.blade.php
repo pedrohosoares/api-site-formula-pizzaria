@@ -54,6 +54,9 @@
             $('div.pizzaro-secondary-navigation').attr('style', 'background: #FFF;');
         }
     });
+    $(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
 </script>
 
 </body>

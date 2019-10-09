@@ -142,6 +142,7 @@
                         <h3>
                             {{ __('Valor total: ') }} {{ __('R$') }}
                             <span class="valorTotal">0,00</span>
+                            <span class="fa fa-list pull-right" id="abrirRevisao" style=" color: #666; cursor: pointer; "></span>
                         </h3>
                         <hr />
 
@@ -157,5 +158,6 @@
 
     </div>
 </div>
+@include('components.menu_itens');
 @include('components.mapa')
 @include('layouts.footer')

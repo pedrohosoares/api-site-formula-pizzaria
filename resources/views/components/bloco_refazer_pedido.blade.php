@@ -56,23 +56,35 @@
 
     div.conjuntoQuantidade {
         display: block;
-        width: 33.33333%;
+        width: 336px;
         height: 54px;
         float: left;
     }
 
     .imgOutros {
-        display: block;
-        background-repeat: no-repeat;
-        height: 300px;
-        background-size: 300px;
-        background-position: center;
+        display: block !important;
+        background-repeat: no-repeat !important;
+        height: 300px !important;
+        background-size: 300px !important;
+        background-position: center !important;
+    }
+
+    .adicionadoAoCarrinho{
+        position: fixed; right: 0; width: 225px; background: #FFF; height: 50px; border-radius: 0px 0px 0px 10px; padding: 10px; color: #000; font-family: sans-serif; font-weight: 600; top: -1px; z-index: 99999; box-shadow: #666 0px 0px 5px;
+    }
+
+    @media (max-width:662px) {
+        button.comprar {
+            width: 95%;
+            position: fixed;
+            bottom: 4px;
+            z-index: 9;
+        }
     }
 </style>
-
 <div class="preload">
     <img src="<?php echo asset('img'); ?>/preloader-3.gif" style="text-align: center;margin: auto;width:140px;">
-    <p style="text-align:center;color: #000;font-weight: 600;">Carregando..</p>
+    <p style="text-align:center;color: #000;font-weight: 600;">{{ __('Carregando..') }}</p>
 </div>
 
 <form action="" method="" id="formEscolhe" style="display:none;">
@@ -92,9 +104,9 @@
                     <label for="">{{ __('Tamanhos / Tipos') }}</label>
                     <br>
                     <select name="cod_tamanhos" id="" class="form-control">
-                        <option value="">{{ __('Selecione') }}</option>
+                        <option value="" json="{}">{{ __('Selecione') }}</option>
                         @foreach($tamanhos as $i=>$v)
-                        <option value="{{ $v->cod_tamanhos }}">{{ $v->tamanho }}</option>
+                        <option value="{{ $v->cod_tamanhos }}" json="{{ json_encode($v,true) }}">{{ $v->tamanho }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -102,7 +114,7 @@
                     <label for="">{{ __('Bebidas') }}</label>
                     <br>
                     <select name="cod_bebidas_ipi_conteudos_bebida" id="" class="form-control">
-                        <option value="">{{ __('Selecione') }}</option>
+                        <option value="" json="{}">{{ __('Selecione') }}</option>
                         @foreach($bebidas as $b)
                         <option value="{{ $b->cod_bebidas_ipi_conteudos }}" json="{{ json_encode($b,true) }}">{{ $b->bebida.' '.$b->conteudo.' - '.__('R$').$b->preco }}</option>
                         @endforeach
@@ -112,7 +124,7 @@
                     <label for="">{{ __('Sobremesas') }}</label>
                     <br>
                     <select name="cod_bebidas_ipi_conteudos_sobremesas" id="" class="form-control">
-                        <option value="">{{ __('Selecione') }}</option>
+                        <option value="" json="{}">{{ __('Selecione') }}</option>
                         @foreach($sobremesas as $b)
                         <option value="{{ $b->cod_bebidas_ipi_conteudos }}" json="{{ json_encode($b,true) }}">{{ $b->bebida.' '.$b->conteudo.' - '.__('R$').$b->preco }}</option>
                         @endforeach
@@ -122,19 +134,19 @@
                     <label for="">{{ __('Tipo de massa') }}</label>
                     <br>
                     <select name="cod_tipo_massas" id="" class="form-control">
-                        <option value="">{{ __('Selecione') }}</option>
+                        <option value="" json="{}">{{ __('Selecione') }}</option>
                         @foreach($tipo_massa as $i=>$v)
-                        <option value="{{ $v->cod_tipo_massa }}">{{ $v->tipo_massa }}</option>
+                        <option value="{{ $v->cod_tipo_massa }}" json="{{ json_encode($v,true) }}">{{ $v->tipo_massa }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="row salgados">
-                    <label for="">Borda</label>
+                    <label for="">{{ __('Borda') }}</label>
                     <br>
                     <select name="cod_bordas" id="" class="form-control">
-                        <option value="0">{{ __('Normal') }}</option>
+                        <option value="0" json="{}">{{ __('Normal') }}</option>
                         @foreach($borda as $i=>$v)
-                        <option value="{{ $v->cod_bordas }}">{{ $v->borda }}</option>
+                        <option value="{{ $v->cod_bordas }}" json="{{ json_encode($v,true) }}">{{ $v->borda }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -150,7 +162,7 @@
                     <label for="">{{ __('Sabor') }}</label>
                     <br />
                     <select name="cod_pizzas_1" id="" class="form-control">
-                        <option value="">{{ __('Selecione o tamanho') }}</option>
+                        <option value="" json="{}">{{ __('Selecione o tamanho') }}</option>
                     </select>
                 </div>
                 <div class="row salgados hide">
@@ -181,7 +193,7 @@
                 </div>
                 <div class="col-md-6 imgPizza imgEsquerda">
                 </div>
-                <div class="col-md-6 imgOutros hide">
+                <div class="col-md-12 imgOutros hide">
                 </div>
             </div>
             <div class="col-md-3 hide fracao2">
@@ -189,7 +201,7 @@
                     <label for="">{{ __('Sabor (2° Fração)') }}</label>
                     <br>
                     <select name="cod_pizzas_2" id="" class="form-control">
-                        <option value="">{{ __('Selecione o tamanho') }}</option>
+                        <option value="" json="{}">{{ __('Selecione o tamanho') }}</option>
                     </select>
                 </div>
             </div>
@@ -211,6 +223,26 @@
             </div>
         </div>
         <br />
+        <div class="row">
+            <div class="col-md-12 row">
+                <div class="conjuntoQuantidade" style=""><label class="form-check-label nomeIngrediente" for="inlineCheckbox1">{{ __('Quantidade') }}</label>
+                    <div class="form-check form-check-inline addIngrediente" style="margin-left: 88px;">
+                        <span class="plus addQuantidade">+</span>
+                        <input type="text" value="1" id="quantidadePedido" class="form-check-input input-addingredientes" />
+                        <span class="minus diminuiQuantidade">-</span>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <button class="btn btn-lg btn-success comprar col-md-2">
+                    <span class="fa fa-shopping-cart"></span> {{ __('Add ao Carrinho') }}
+                </button>
+                <button style="margin-left:10px;" class="btn btn-lg btn-primary finalizarPedido col-md-2">
+                    {{ __('Finalizar pedido!') }}
+                </button>
+            </div>
+        </div>
+        <br />
         <div class="row salgados">
             <label for="" style="cursor:pointer;" id="clickAdicionais">{{ __('Adicionais - Clique para abrir') }}</label>
             <hr />
@@ -221,6 +253,12 @@
     </div>
 
 </form>
+<div class="adicionadoAoCarrinho" style="display:none;">
+    <div>
+        <span style="float:left;">{{ __('Adicionado ao carrinho') }}</span>
+        <span class="fa fa-check" style=" float: right; top: 7px; position: fixed; font-size: 29px; "></span>
+    </div>
+</div>
 @endif
 <script>
     $(function() {
@@ -237,6 +275,10 @@
         let imgEsquerda = $('div.imgEsquerda');
         let precoTotal = 0;
 
+        const adicionadoAoCarrinho = $('.adicionadoAoCarrinho');
+        const addQuantidade = $('.addQuantidade');
+        const diminuiQuantidade = $('.diminuiQuantidade');
+        const quantidadePedido = $('div#quantidadePedido');
         const divAdicionais = $('div#adicionais');
         const divingredientes = $('div#ingredientes');
         const divingredientes2 = $('div#ingredientes2');
@@ -254,7 +296,12 @@
         const conteudo_sobremesas = $('select[name="cod_bebidas_ipi_conteudos_sobremesas"]');
         const conteudo_bebidas = $('select[name="cod_bebidas_ipi_conteudos_bebida"]');
         const imgOutros = $('div.imgOutros');
+        const imgSalgado = "{{ env('IMG_SALGADO') }}";
+        const imgBebidas = "{{ env('IMG_BEBIDAS') }}";
+        const btnComprar = $('button.comprar');
 
+
+        let cookies = [];
         let dadosIngredientes;
         let dadosTamanhos;
         let dadosCorte;
@@ -275,25 +322,54 @@
             }, 1000);
         }
 
+        const selecionaImagemOpcaoBebida = function() {
+            let json = JSON.parse(conteudo_bebidas.find('option:selected').attr('json'));
+            imgOutros.attr("style", 'background: url(' + imgBebidas + json.foto_grande + ')');
+        }
+
+        const selecionaImagemOpcaoSobremesa = function() {
+            let json = JSON.parse(conteudo_sobremesas.find('option:selected').attr('json'));
+            imgOutros.attr("style", 'background: url(' + imgBebidas + json.foto_grande + ')');
+        }
+
+        const selecionaImagemPizza = function() {
+            let json = JSON.parse(pizzas.find('option:selected').attr('json'));
+            if (cod_fracoes.val() == 2) {
+                let json2 = JSON.parse(pizzas2.find('option:selected').attr('json'));
+                imgDireita.attr("style", 'background: url(' + imgSalgado + json.foto_grande + ')');
+                imgEsquerda.attr("style", 'background: url(' + imgSalgado + json2.foto_grande + ')');
+            } else {
+                imgDireita.attr("style", 'background: url(' + imgSalgado + json.foto_grande + ')');
+                imgEsquerda.attr("style", 'background: url(' + imgSalgado + json.foto_grande + ')');
+            }
+        }
 
         const escondeExibe = function(produto) {
-
             if (produto == 'salgado') {
                 salgados.fadeIn();
                 bebidas.fadeOut();
                 sobremesas.fadeOut();
+                imgOutros.attr('style', 'display:none;height:0px !important;');
+                selecionaImagemPizza();
             }
             if (produto == 'sobremesa') {
                 salgados.fadeOut();
                 bebidas.fadeOut();
                 sobremesas.fadeIn();
+                imgOutros.attr('style', 'display:none;');
+                imgDireita.attr('style', 'display:none;');
+                imgEsquerda.attr('style', 'display:none;');
+                selecionaImagemOpcaoSobremesa();
             }
             if (produto == 'bebida') {
                 salgados.fadeOut();
                 bebidas.fadeIn();
                 sobremesas.fadeOut();
+                imgOutros.attr('style', 'display:none;');
+                imgDireita.attr('style', 'display:none;');
+                imgEsquerda.attr('style', 'display:none;');
+                selecionaImagemOpcaoBebida();
             }
-
         }
 
         const pegaTodasBordas = function(cod_pizzarias) {
@@ -484,11 +560,11 @@
             imgOutros.addClass('hide');
             //Se for uma fração, muda as duas imagens
             if (cod_fracoes.val() == 1) {
-                imgEsquerda.attr('style', 'background:url({{ env('IMG_SALGADO ') }}' + json.foto_grande + ')');
-                imgDireita.attr('style', 'background:url({{ env('IMG_SALGADO ') }}' + json.foto_grande + ')');
+                imgEsquerda.attr('style', "background:url(" + imgSalgado + json.foto_grande + ')');
+                imgDireita.attr('style', "background:url(" + imgSalgado + json.foto_grande + ')');
             } else {
                 //Se for duas frações, muda a da esquerda
-                imgDireita.attr('style', 'background:url({{ env('IMG_SALGADO ') }}' + json.foto_grande + ')');
+                imgDireita.attr('style', "background:url(" + imgSalgado + json.foto_grande + ')');
             }
 
             divAdicionais.fadeOut().html('<i>Carregando..</i>').fadeIn();
@@ -509,12 +585,93 @@
             pizzasFiltradas.forEach((v) => {
                 opcoesPizzas += "<option value='" + v.cod_pizzas + "' json='" + JSON.stringify(v) + "'>" + v.pizza + "</option>";
             });
+
             pizzas.html(opcoesPizzas);
             opcoesPizzas += "<option value='' json='{}'>{{ __('Selecione um sabor') }}</option>";
             pizzas2.html(opcoesPizzas);
 
             carregaPizzasImagemIngredienteAdicionais(pizzasFiltradas[0].cod_pizzas);
 
+        }
+
+        const resetaDados = function() {
+            tamanhos.val('');
+            borda.val();
+            cod_fracoes.val('');
+            pizzas.val('');
+            pizzas2.val('');
+            quantidadePedido.val('');
+            conteudo_sobremesas.val('');
+            conteudo_bebidas.val('');
+        }
+
+        const salvarCookies = function() {
+            let ingredientesSabor1 = divingredientes.find('input[type="checkbox"]:checked');
+            let ingredientesSabor2 = divingredientes2.find('input[type="checkbox"]:checked');
+            let ingredientesSabor1JSON = [];
+            let ingredientesSabor2JSON = [];
+
+            if (ingredientesSabor1.length > 0) {
+                ingredientesSabor1.forEach(function(v) {
+                    ingredientesSabor1JSON.push($(v).attr('json'));
+                });
+            }
+            if (ingredientesSabor2.length > 0) {
+                ingredientesSabor2.forEach(function(v) {
+                    ingredientesSabor2JSON.push($(v).attr('json'));
+                });
+            }
+
+            let dados = {
+                "bebidas": [
+                    JSON.parse(conteudo_bebidas.find('option:selected').attr('json')),
+                    {
+                        "quantidade": quantidadePedido.val() || 0
+                    }
+                ],
+                "sobremesas": [
+                    JSON.parse(conteudo_sobremesas.find('option:selected').attr('json')),
+                    {
+                        "quantidade": quantidadePedido.val() || 0
+                    }
+                ],
+                "salgados": {
+                    "quantidade": quantidadePedido.val() || 0,
+                    "cod_tamanhos": tamanhos.val(),
+                    "bordas": JSON.parse(borda.find('option:selected').attr('json')),
+                    "cod_fracoes": cod_fracoes.val(),
+                    "sabores": [
+                        [{
+                                "dados": JSON.parse(pizzas.find('option:selected').attr('json'))
+                            },
+                            {
+                                "ingredientes": ingredientesSabor1JSON
+                            }
+                        ],
+                        [{
+                                "dados": JSON.parse(pizzas2.find('option:selected').attr('json'))
+                            },
+                            {
+                                "ingredientes": ingredientesSabor2JSON
+                            }
+                        ]
+                    ]
+                }
+            };
+            cookies.push(dados);
+            document.cookie = "item=" + JSON.stringify(cookies);
+            console.log(cookies);
+            resetaDados();
+        }
+
+        const clicarComprar = function() {
+            $(btnComprar).click(function(e) {
+                e.preventDefault();
+                $(this).attr('disabled', 'disabled');
+                salvarCookies();
+                $(this).removeAttr('disabled');
+                adicionadoAoCarrinho.fadeIn(300).delay(2300).fadeOut(200);
+            });
         }
 
         tamanhos.change(function(e) {
@@ -537,11 +694,10 @@
             codPizza2 = $(this).val();
             let json = JSON.parse($('select[name="cod_pizzas_2"] option:selected').attr('json'));
             imgOutros.addClass('hide');
-            imgEsquerda.attr('style', 'background:url({{ env('IMG_SALGADO ') }}' + json.foto_grande + ')');
+            imgEsquerda.attr('style', 'background:url(' + imgSalgado + json.foto_grande + ')');
             $('div#ingredientes2').fadeOut().html('<i>Carregando..</i>').fadeIn();
             getIngredientes2(codPizzaria, cod_tamanhos, codPizza2);
         });
-
 
         cod_fracoes.change(function(e) {
             e.preventDefault();
@@ -561,7 +717,7 @@
             e.preventDefault();
             let json = JSON.parse($('select[name="cod_bebidas_ipi_conteudos_sobremesas"] option:selected').attr('json'));
             imgPizza.fadeOut();
-            imgOutros.attr('style', 'background:url({{ env('IMG_BEBIDAS ') }}' + json.foto_grande + ')');
+            imgOutros.attr('style', 'background:url(' + imgBebidas + json.foto_grande + ')');
             imgOutros.removeClass('hide').fadeIn();
         });
 
@@ -569,11 +725,14 @@
             e.preventDefault();
             let json = JSON.parse($('select[name="cod_bebidas_ipi_conteudos_bebida"] option:selected').attr('json'));
             imgPizza.fadeOut();
-            imgOutros.attr('style', 'background:url({{ env('IMG_BEBIDAS ') }}' + json.foto_grande + ')');
+            imgOutros.attr('style', 'background:url(' + imgBebidas + json.foto_grande + ')');
             imgOutros.removeClass('hide').fadeIn();
         });
 
+        aumentaDiminuiQuantidade('.addQuantidade');
+        aumentaDiminuiQuantidade('.diminuiQuantidade');
         sumirPreLoader();
+        clicarComprar();
 
     });
 </script>

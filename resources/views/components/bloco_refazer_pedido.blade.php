@@ -69,8 +69,20 @@
         background-position: center !important;
     }
 
-    .adicionadoAoCarrinho{
-        position: fixed; right: 0; width: 225px; background: #FFF; height: 50px; border-radius: 0px 0px 0px 10px; padding: 10px; color: #000; font-family: sans-serif; font-weight: 600; top: -1px; z-index: 99999; box-shadow: #666 0px 0px 5px;
+    .adicionadoAoCarrinho {
+        position: fixed;
+        right: 0;
+        width: 225px;
+        background: #FFF;
+        height: 50px;
+        border-radius: 0px 0px 0px 10px;
+        padding: 10px;
+        color: #000;
+        font-family: sans-serif;
+        font-weight: 600;
+        top: -1px;
+        z-index: 99999;
+        box-shadow: #666 0px 0px 5px;
     }
 
     @media (max-width:662px) {
@@ -228,16 +240,16 @@
                 <div class="conjuntoQuantidade" style=""><label class="form-check-label nomeIngrediente" for="inlineCheckbox1">{{ __('Quantidade') }}</label>
                     <div class="form-check form-check-inline addIngrediente" style="margin-left: 88px;">
                         <span class="plus addQuantidade">+</span>
-                        <input type="text" value="1" id="quantidadePedido" class="form-check-input input-addingredientes" />
+                        <input type="text" value="1" json='{"quantidade":1}' id="quantidadePedido" class="form-check-input input-addingredientes" />
                         <span class="minus diminuiQuantidade">-</span>
                     </div>
                 </div>
                 <br>
                 <br>
-                <button class="btn btn-lg btn-success comprar col-md-2">
+                <button class="btn btn-success comprar col-md-2" style="width:144px;">
                     <span class="fa fa-shopping-cart"></span> {{ __('Add ao Carrinho') }}
                 </button>
-                <button style="margin-left:10px;" class="btn btn-lg btn-primary finalizarPedido col-md-2">
+                <button style="margin-left:10px;width:135px;" class="btn btn-primary finalizarPedido col-md-2">
                     {{ __('Finalizar pedido!') }}
                 </button>
             </div>
@@ -264,21 +276,34 @@
     $(function() {
 
 
-        let formEscolhe = $('form#formEscolhe');
-        let preload = $('div.preload');
         let somePreloader = 0;
         let dadosBorda;
         let dadosPizzas;
         let dadosBebidas;
         let dadosAdicionais;
-        let imgDireita = $('div.imgDireita');
-        let imgEsquerda = $('div.imgEsquerda');
         let precoTotal = 0;
+        let cookiePedidos;
+        let dadosPedidos = '';
+        let valida;
+        valida = false;
 
+
+        const fecharAba = $('span#fecharAba');
+        const abrirRevisao = $('span#abrirRevisao');
+        const pedidos = $('div#pedidos');
+        const revisePedidos = $('div#revisePedidos');
+        const finalizarPedido = $('button.finalizarPedido');
+        const btnComprar = $('button.comprar');
+
+
+        const formEscolhe = $('form#formEscolhe');
+        const preload = $('div.preload');
+        const imgDireita = $('div.imgDireita');
+        const imgEsquerda = $('div.imgEsquerda');
         const adicionadoAoCarrinho = $('.adicionadoAoCarrinho');
         const addQuantidade = $('.addQuantidade');
         const diminuiQuantidade = $('.diminuiQuantidade');
-        const quantidadePedido = $('div#quantidadePedido');
+        const quantidadePedido = $('input#quantidadePedido');
         const divAdicionais = $('div#adicionais');
         const divingredientes = $('div#ingredientes');
         const divingredientes2 = $('div#ingredientes2');
@@ -298,7 +323,7 @@
         const imgOutros = $('div.imgOutros');
         const imgSalgado = "{{ env('IMG_SALGADO') }}";
         const imgBebidas = "{{ env('IMG_BEBIDAS') }}";
-        const btnComprar = $('button.comprar');
+        const selectProduto = $('select[name="produto"]');
 
 
         let cookies = [];
@@ -344,13 +369,17 @@
             }
         }
 
+        const escondeExibeSalgado = function() {
+            salgados.fadeIn();
+            bebidas.fadeOut();
+            sobremesas.fadeOut();
+            imgOutros.attr('style', 'display:none;height:0px !important;');
+            selecionaImagemPizza()
+        }
+
         const escondeExibe = function(produto) {
             if (produto == 'salgado') {
-                salgados.fadeIn();
-                bebidas.fadeOut();
-                sobremesas.fadeOut();
-                imgOutros.attr('style', 'display:none;height:0px !important;');
-                selecionaImagemPizza();
+                escondeExibeSalgado();
             }
             if (produto == 'sobremesa') {
                 salgados.fadeOut();
@@ -452,7 +481,7 @@
             $('span.valorTotal').html(precoTotal.toFixed(2));
         });
 
-        $('select[name="produto"]').change(function(e) {
+        selectProduto.change(function(e) {
             e.preventDefault();
             produto = $(this).val();
             escondeExibe(produto);
@@ -464,17 +493,20 @@
             $(valor).click(function() {
                 let este = this;
                 let valor;
+                let json = JSON.parse($(este).parent().find('input').attr('json'));
+                console.log(json);
                 valor = Number.parseInt($(este).parent().find('input').val());
-                if ($(este).attr('class') == 'plus') {
+                if ($(este).attr('class').indexOf('plus') > -1) {
                     valor = valor + 1;
                 }
-                if ($(este).attr('class') == 'minus') {
+                if ($(este).attr('class').indexOf('minus') > -1) {
                     valor = valor - 1;
                     if (valor < 0) {
                         valor = 0;
                     }
                 }
-                $(este).parent().find('input').val(valor);
+                json.quantidade = valor;
+                $(este).parent().find('input').val(valor).attr('json', JSON.stringify(json));
             });
         }
 
@@ -498,7 +530,7 @@
                             response += '<div class="conjuntoQuantidade">';
                             response += '<div class="form-check form-check-inline addIngrediente">';
                             response += '<span class="plus">+</span>';
-                            response += '<input type="text" preco="' + v.preco + '" nome="' + v.ingrediente + '" cod_ingredientes="' + v.cod_ingredientes + '" name="ipi_ingredientes[' + v.cod_ingredientes + ']" value="0" class="form-check-input input-addingredientes">';
+                            response += "<input type='text' json='" + JSON.stringify(v) + "' preco='" + v.preco + "' nome='" + v.ingrediente + "' cod_ingredientes='" + v.cod_ingredientes + "' name='ipi_ingredientes[" + v.cod_ingredientes + "]' value='0' class='form-check-input input-addingredientes'>";
                             response += '<span class="minus">-</span>';
                             response += '</div>';
                             response += '<label class="form-check-label nomeIngrediente" for="inlineCheckbox1"> ' + v.ingrediente + ' <span>';
@@ -510,7 +542,9 @@
                     } else {
                         response = "<i>Não sugerimos nenhum adicionais para esse pedido! ;)</i>";
                     }
+
                     divAdicionais.hide().html(response).fadeIn();
+                    mudaAdicionais();
                     aumentaDiminuiQuantidade('span.plus');
                     aumentaDiminuiQuantidade('span.minus');
                 }
@@ -605,44 +639,62 @@
             conteudo_bebidas.val('');
         }
 
+
+        const mudaAdicionais = function() {
+            divAdicionais.find('input[type="text"]').on('keyup', function(e) {
+                let este = this;
+                let json = JSON.parse($(this).attr('json'));
+                json.quantidade = $(este).val();
+                $(este).attr('json', JSON.stringify(json));
+            });
+        }
+
+
         const salvarCookies = function() {
+
             let ingredientesSabor1 = divingredientes.find('input[type="checkbox"]:checked');
             let ingredientesSabor2 = divingredientes2.find('input[type="checkbox"]:checked');
             let ingredientesSabor1JSON = [];
             let ingredientesSabor2JSON = [];
+            let adicionaisJSON = [];
 
             if (ingredientesSabor1.length > 0) {
-                ingredientesSabor1.forEach(function(v) {
+                ingredientesSabor1.each(function(i, v) {
                     ingredientesSabor1JSON.push($(v).attr('json'));
                 });
             }
+
             if (ingredientesSabor2.length > 0) {
-                ingredientesSabor2.forEach(function(v) {
+                ingredientesSabor2.each(function(i, v) {
                     ingredientesSabor2JSON.push($(v).attr('json'));
                 });
             }
+
+            divAdicionais.find('input[type="text"]').each(function(i, v) {
+                adicionaisJSON.push($(v).attr('JSON'));
+            });
 
             let dados = {
                 "bebidas": [
                     JSON.parse(conteudo_bebidas.find('option:selected').attr('json')),
                     {
-                        "quantidade": quantidadePedido.val() || 0
+                        "quantidade": quantidadePedido.val()
                     }
                 ],
                 "sobremesas": [
                     JSON.parse(conteudo_sobremesas.find('option:selected').attr('json')),
                     {
-                        "quantidade": quantidadePedido.val() || 0
+                        "quantidade": quantidadePedido.val()
                     }
                 ],
                 "salgados": {
-                    "quantidade": quantidadePedido.val() || 0,
+                    "quantidade": quantidadePedido.val(),
                     "cod_tamanhos": tamanhos.val(),
-                    "bordas": JSON.parse(borda.find('option:selected').attr('json')),
+                    "bordas": borda.find('option:selected').attr('json') == undefined ? {} : JSON.parse(borda.find('option:selected').attr('json')),
                     "cod_fracoes": cod_fracoes.val(),
                     "sabores": [
                         [{
-                                "dados": JSON.parse(pizzas.find('option:selected').attr('json'))
+                                "dados": pizzas.find('option:selected').attr('json') == undefined ? {} : JSON.parse(pizzas.find('option:selected').attr('json'))
                             },
                             {
                                 "ingredientes": ingredientesSabor1JSON
@@ -655,23 +707,15 @@
                                 "ingredientes": ingredientesSabor2JSON
                             }
                         ]
-                    ]
+                    ],
+                    "adicionais": adicionaisJSON
                 }
             };
+
             cookies.push(dados);
             document.cookie = "item=" + JSON.stringify(cookies);
-            console.log(cookies);
-            resetaDados();
-        }
 
-        const clicarComprar = function() {
-            $(btnComprar).click(function(e) {
-                e.preventDefault();
-                $(this).attr('disabled', 'disabled');
-                salvarCookies();
-                $(this).removeAttr('disabled');
-                adicionadoAoCarrinho.fadeIn(300).delay(2300).fadeOut(200);
-            });
+            resetaDados();
         }
 
         tamanhos.change(function(e) {
@@ -729,10 +773,112 @@
             imgOutros.removeClass('hide').fadeIn();
         });
 
+
+        const leCookie = function() {
+
+            cookiePedidos = document.cookie.split(";");
+            cookiePedidos = cookiePedidos[0].split("item=");
+            cookiePedidos = JSON.parse(cookiePedidos[1]);
+            cookiePedidos = cookiePedidos[0];
+
+            for (let i in cookiePedidos) {
+                dadosPedidos += "<h5 style='text-transform: capitalize;'>" + i + "</h5>";
+
+                if (i == 'salgados') {
+                    if (cookiePedidos[i].quantidade > 0) {
+                        if (Object.keys(cookiePedidos[i])[0] == 'quantidade') {
+                            if (cookiePedidos[i].quantidade != undefined) {
+                                dadosPedidos += "<h6>Quantidade: " + cookiePedidos[i].quantidade + "</h6>";
+                            }
+                        }
+                        if (Object.keys(cookiePedidos[i])[3] == 'cod_fracoes') {
+                            if (cookiePedidos[i].cod_fracoes != undefined) {
+                                dadosPedidos += "<h6>Qntd Frações: " + cookiePedidos[i].cod_fracoes + "</h6>";
+                            }
+                        }
+                        if (Object.keys(cookiePedidos[i])[2] == 'bordas') {
+                            if (cookiePedidos[i].bordas.borda != undefined) {
+                                dadosPedidos += "<h6>Bordas: " + cookiePedidos[i].bordas.borda + "</h6>";
+                            }
+                        }
+                        if (Object.keys(cookiePedidos[i])[2] == 'sabores') {
+                            if ($(cookiePedidos[i][0].sabores[0][0]).length > 0) {
+                                dadosPedidos += "<h6>Bordas: " + cookiePedidos[i].bordas.borda + "</h6>";
+                            }
+                        }
+                    }
+                } else {
+                    if (cookiePedidos[i][1].quantidade > 0) {
+                        dadosPedidos += "<h6>Quantidade: " + cookiePedidos[i][1].quantidade + "</h6>";
+                        dadosPedidos += "<h6> - " + cookiePedidos[i][0].bebida + " " + cookiePedidos[i][0].conteudo + " - {{ __('R$') }}" + cookiePedidos[i][0].preco + "</h6>";
+                    }
+                }
+                pedidos.html(dadosPedidos);
+                dadosPedidos = '';
+            }
+        }
+
+        const clicarComprar = function() {
+            $(btnComprar).click(function(e) {
+                e.preventDefault();
+                if (validacaoCarrinho()) {
+                    $(this).attr('disabled', 'disabled');
+                    salvarCookies();
+                    $(this).removeAttr('disabled');
+                    adicionadoAoCarrinho.fadeIn(300).delay(2300).fadeOut(200);
+                }
+            });
+        }
+
+        const validacaoCarrinho = function() {
+
+            let possuiItens = (Number.parseInt($(quantidadePedido).val()) > 0);
+
+            if (selectProduto.val() == 'salgado') {
+                if (tamanhos.val() != "" && borda.val() != "" && pizzas.val() != "" && possuiItens) {
+                    valida = true;
+                }
+            } else if (selectProduto.val() == 'sobremesa' && possuiItens) {
+                if (conteudo_sobremesas.val() != "") {
+                    valida = true;
+                }
+            } else if (selectProduto.val() == 'bebida' && possuiItens) {
+                if (conteudo_bebidas.val() != "") {
+                    valida = true;
+                }
+            }
+
+            if (valida == false) {
+                $('div.alert.alert-danger').text("{{ __('Você precisa selecionar algum item') }}").fadeIn(300);
+                $([document.documentElement, document.body]).animate({
+                    scrollTop: $('#alerta-danger').offset().top
+                }, 330);
+            } else {
+                $('div.alert.alert-danger').text("{{ __('Você precisa selecionar algum item') }}").fadeOut(100);
+            }
+            return valida;
+        }
+
+        finalizarPedido.click(function(e) {
+            e.preventDefault();
+            let este = this;
+            leCookie();
+            revisePedidos.modal('show');
+        });
+
+        const fechaAbreRevisao = function(e) {
+            leCookie();
+        }
+
+        fecharAba.click(fechaAbreRevisao);
+        abrirRevisao.click(fechaAbreRevisao);
+
+
+        clicarComprar();
+        escondeExibeSalgado();
         aumentaDiminuiQuantidade('.addQuantidade');
         aumentaDiminuiQuantidade('.diminuiQuantidade');
         sumirPreLoader();
-        clicarComprar();
 
     });
 </script>

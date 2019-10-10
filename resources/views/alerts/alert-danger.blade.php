@@ -1,0 +1,1 @@
+<div class="alert alert-danger" id="alerta-danger" style="display:none;"></div>

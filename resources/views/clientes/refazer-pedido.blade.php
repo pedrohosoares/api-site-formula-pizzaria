@@ -141,11 +141,11 @@
                         </h1>
                         <h3>
                             {{ __('Valor total: ') }} {{ __('R$') }}
-                            <span class="valorTotal">0,00</span>
+                            <span class="valorTotal">0.00</span>
                             <span class="fa fa-list pull-right" id="abrirRevisao" style=" color: #666; cursor: pointer; "></span>
                         </h3>
                         <hr />
-
+                        @include('alerts/alert-danger')
                         @include('components/bloco_refazer_pedido')
 
                     </div>

@@ -6,7 +6,17 @@
                 <h4 class="modal-title">{{ __('Revise seus pedidos') }}</h4>
             </div>
             <div class="modal-body" id="pedidos">
+                <table class='table table-hover'> 
+                    <tbody>
 
+                    </tbody>
+                    <tfoot>
+                        <th colspan="2">
+                            {{ __('R$') }}
+                            <span id="valorTotalRevisao">0.00</span>
+                        </th>
+                    </tfoot>
+                </table>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Fechar') }}</button>

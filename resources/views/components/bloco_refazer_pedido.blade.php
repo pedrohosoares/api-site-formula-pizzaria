@@ -240,7 +240,7 @@
                 <div class="conjuntoQuantidade" style=""><label class="form-check-label nomeIngrediente" for="inlineCheckbox1">{{ __('Quantidade') }}</label>
                     <div class="form-check form-check-inline addIngrediente" style="margin-left: 88px;">
                         <span class="plus addQuantidade">+</span>
-                        <input type="text" value="1" json='{"quantidade":1}' id="quantidadePedido" class="form-check-input input-addingredientes" />
+                        <input type="text" value="0" json='{"quantidade":0}' id="quantidadePedido" class="form-check-input input-addingredientes" />
                         <span class="minus diminuiQuantidade">-</span>
                     </div>
                 </div>
@@ -282,7 +282,6 @@
         let dadosBebidas;
         let dadosAdicionais;
         let precoTotal = 0;
-        let cookiePedidos;
         let dadosPedidos = '';
         let valida;
         valida = false;
@@ -324,8 +323,13 @@
         const imgSalgado = "{{ env('IMG_SALGADO') }}";
         const imgBebidas = "{{ env('IMG_BEBIDAS') }}";
         const selectProduto = $('select[name="produto"]');
+        const valorTotalRevisao = $('#valorTotalRevisao');
 
 
+        let produtoEscolhido;
+        function setProdutoEscolhido(produto){
+            produtoEscolhido = produto;
+        }
         let cookies = [];
         let dadosIngredientes;
         let dadosTamanhos;
@@ -377,10 +381,18 @@
             selecionaImagemPizza()
         }
 
+        const somaValoresProdutosEscolhidos = function(){
+
+        }
+
         const escondeExibe = function(produto) {
+            
+            produtoEscolhido = produto;
+            
             if (produto == 'salgado') {
                 escondeExibeSalgado();
             }
+            
             if (produto == 'sobremesa') {
                 salgados.fadeOut();
                 bebidas.fadeOut();
@@ -390,6 +402,7 @@
                 imgEsquerda.attr('style', 'display:none;');
                 selecionaImagemOpcaoSobremesa();
             }
+            
             if (produto == 'bebida') {
                 salgados.fadeOut();
                 bebidas.fadeIn();
@@ -399,6 +412,7 @@
                 imgEsquerda.attr('style', 'display:none;');
                 selecionaImagemOpcaoBebida();
             }
+
         }
 
         const pegaTodasBordas = function(cod_pizzarias) {
@@ -609,23 +623,22 @@
 
         const filtraPizzasPorTamanho = function(cod_tamanhos) {
 
-            cod_tamanhos = Number.parseInt(cod_tamanhos);
+            if (cod_tamanhos != undefined && cod_tamanhos != "") {
 
-            let pizzasFiltradas = dadosPizzas.filter((v) => {
-                return v.cod_tamanhos === cod_tamanhos;
-            });
+                cod_tamanhos = Number.parseInt(cod_tamanhos);
+                let pizzasFiltradas = dadosPizzas.filter((v) => {
+                    return v.cod_tamanhos === cod_tamanhos;
+                });
+                let opcoesPizzas = "<option value='' json='{}'>{{ __('Selecione..') }}</option>";
+                pizzasFiltradas.forEach((v) => {
+                    opcoesPizzas += "<option value='" + v.cod_pizzas + "' json='" + JSON.stringify(v) + "'>" + v.pizza + "</option>";
+                });
+                pizzas.html(opcoesPizzas);
+                opcoesPizzas += "<option value='' json='{}'>{{ __('Selecione um sabor') }}</option>";
+                pizzas2.html(opcoesPizzas);
+                carregaPizzasImagemIngredienteAdicionais(pizzasFiltradas[0].cod_pizzas);
 
-            let opcoesPizzas = "";
-            pizzasFiltradas.forEach((v) => {
-                opcoesPizzas += "<option value='" + v.cod_pizzas + "' json='" + JSON.stringify(v) + "'>" + v.pizza + "</option>";
-            });
-
-            pizzas.html(opcoesPizzas);
-            opcoesPizzas += "<option value='' json='{}'>{{ __('Selecione um sabor') }}</option>";
-            pizzas2.html(opcoesPizzas);
-
-            carregaPizzasImagemIngredienteAdicionais(pizzasFiltradas[0].cod_pizzas);
-
+            }
         }
 
         const resetaDados = function() {
@@ -634,7 +647,7 @@
             cod_fracoes.val('');
             pizzas.val('');
             pizzas2.val('');
-            quantidadePedido.val('');
+            quantidadePedido.val('0');
             conteudo_sobremesas.val('');
             conteudo_bebidas.val('');
         }
@@ -713,8 +726,7 @@
             };
 
             cookies.push(dados);
-            document.cookie = "item=" + JSON.stringify(cookies);
-
+            localStorage.setItem('item', JSON.stringify(cookies));
             resetaDados();
         }
 
@@ -776,75 +788,104 @@
 
         const leCookie = function() {
 
-            cookiePedidos = document.cookie.split(";");
-            cookiePedidos = cookiePedidos[0].split("item=");
-            cookiePedidos = JSON.parse(cookiePedidos[1]);
-            cookiePedidos = cookiePedidos[0];
+            let dadosPedidos = "";
+            let cookiePedidos = JSON.parse(localStorage.getItem('item'));
+            let valorCarrinho = 0.00;
 
-            for (let i in cookiePedidos) {
-                dadosPedidos += "<h5 style='text-transform: capitalize;'>" + i + "</h5>";
+            cookiePedidos.forEach((v, i) => {
 
-                if (i == 'salgados') {
-                    if (cookiePedidos[i].quantidade > 0) {
-                        if (Object.keys(cookiePedidos[i])[0] == 'quantidade') {
-                            if (cookiePedidos[i].quantidade != undefined) {
-                                dadosPedidos += "<h6>Quantidade: " + cookiePedidos[i].quantidade + "</h6>";
+                let numeroItem = i + 1;
+                let salgados = v['salgados'];
+                let bebidas = v['bebidas'];
+                let sobremesas = v['sobremesas'];
+
+                if (salgados.quantidade > 0 && salgados.sabores[0][0]['dados'].length != undefined) {
+
+                    let fracoes = salgados.cod_fracoes;
+
+                    if (fracoes < 2) {
+                        dadosPedidos += "<tr>";
+                        dadosPedidos += "<th colspan='2'>" + salgados.sabores[0][0]['dados']['tamanho'] + " R$" + salgados.sabores[0][0]['dados']['preco'] + " Borda: " + salgados.bordas.borda + " - R$" + salgados.bordas.preco + " Quantidade: " + salgados.quantidade + "</th>";
+                        dadosPedidos += "</tr>";
+                        salgados.sabores.forEach(function(sabor) {
+
+                            //dados [0]
+                            //ingredientes [1]
+                            if (sabor[0]['dados']['pizza'] != undefined) {
+
+                                dadosPedidos += "<tr>";
+                                dadosPedidos += "<td colspan='2'> - Sabor: " + salgados.sabores[0][0]['dados']['pizza'] + "</td>";
+                                dadosPedidos += "</tr>";
+
                             }
-                        }
-                        if (Object.keys(cookiePedidos[i])[3] == 'cod_fracoes') {
-                            if (cookiePedidos[i].cod_fracoes != undefined) {
-                                dadosPedidos += "<h6>Qntd Frações: " + cookiePedidos[i].cod_fracoes + "</h6>";
+                        });
+                    } else {
+                        dadosPedidos += "<tr>";
+                        dadosPedidos += "<td colspan='2'>Meio a meio " + sabor[0]['dados']['tamanho'] + " R$" + sabor[0]['dados']['preco'] + " Quantidade: " + salgados.quantidade + " Borda: " + salgados.bordas.borda + " - R$" + salgados.bordas.preco + "</td>";
+                        dadosPedidos += "</tr>";
+                        salgados.sabores.forEach(function(sabor) {
+
+                            //dados [0]
+                            //ingredientes [1]
+
+                            if (sabor[0]['dados']['pizza'] != undefined) {
+
+                                dadosPedidos += "<tr>";
+                                dadosPedidos += "<td colspan='2'> -- " + sabor[0]['dados']['pizza'] + "</td>";
+                                dadosPedidos += "</tr>";
+
                             }
-                        }
-                        if (Object.keys(cookiePedidos[i])[2] == 'bordas') {
-                            if (cookiePedidos[i].bordas.borda != undefined) {
-                                dadosPedidos += "<h6>Bordas: " + cookiePedidos[i].bordas.borda + "</h6>";
-                            }
-                        }
-                        if (Object.keys(cookiePedidos[i])[2] == 'sabores') {
-                            if ($(cookiePedidos[i][0].sabores[0][0]).length > 0) {
-                                dadosPedidos += "<h6>Bordas: " + cookiePedidos[i].bordas.borda + "</h6>";
-                            }
-                        }
-                    }
-                } else {
-                    if (cookiePedidos[i][1].quantidade > 0) {
-                        dadosPedidos += "<h6>Quantidade: " + cookiePedidos[i][1].quantidade + "</h6>";
-                        dadosPedidos += "<h6> - " + cookiePedidos[i][0].bebida + " " + cookiePedidos[i][0].conteudo + " - {{ __('R$') }}" + cookiePedidos[i][0].preco + "</h6>";
+                        });
                     }
                 }
-                pedidos.html(dadosPedidos);
-                dadosPedidos = '';
-            }
-        }
 
-        const clicarComprar = function() {
-            $(btnComprar).click(function(e) {
-                e.preventDefault();
-                if (validacaoCarrinho()) {
-                    $(this).attr('disabled', 'disabled');
-                    salvarCookies();
-                    $(this).removeAttr('disabled');
-                    adicionadoAoCarrinho.fadeIn(300).delay(2300).fadeOut(200);
+                if (bebidas[1].quantidade > 0 && bebidas[0] != undefined && bebidas[0].length >0) {
+                    
+                    dadosPedidos += "<tr>";
+                    dadosPedidos += "<td colspan='2'> Bebida: " + bebidas[0].bebida + bebidas[0].conteudo +" Quantidade: "+bebidas[1].quantidade+"</td>";
+                    dadosPedidos += "</tr>";
+
                 }
+
+                
+                if (sobremesas[1].quantidade > 0 && sobremesas[0] != undefined && sobremesas[0].length >0) {
+                    
+                    dadosPedidos += "<tr>";
+                    dadosPedidos += "<td colspan='2'> Sobremesas: " + sobremesas[0].bebida + sobremesas[0].conteudo +" Quantidade: "+sobremesas[1].quantidade+"</td>";
+                    dadosPedidos += "</tr>";
+
+                }
+                
+
             });
+
+            pedidos.find('table tbody').html(dadosPedidos);
+
         }
 
         const validacaoCarrinho = function() {
 
             let possuiItens = (Number.parseInt($(quantidadePedido).val()) > 0);
+            let pizzasSelecionadas = (pizzas.find('option:selected').val() != undefined && pizzas.find('option:selected').val() != '');
+            let tamanhosSelecionados = tamanhos.val() != undefined && tamanhos.val() != '';
 
             if (selectProduto.val() == 'salgado') {
-                if (tamanhos.val() != "" && borda.val() != "" && pizzas.val() != "" && possuiItens) {
+                if (tamanhos.val() != "" && borda.val() != "" && pizzasSelecionadas && possuiItens) {
                     valida = true;
+                } else {
+                    valida = false;
                 }
-            } else if (selectProduto.val() == 'sobremesa' && possuiItens) {
-                if (conteudo_sobremesas.val() != "") {
+            } else if (selectProduto.val() == 'sobremesa') {
+                if (conteudo_sobremesas.val() != "" && possuiItens) {
                     valida = true;
+                } else {
+                    valida = false;
                 }
-            } else if (selectProduto.val() == 'bebida' && possuiItens) {
-                if (conteudo_bebidas.val() != "") {
+            } else if (selectProduto.val() == 'bebida') {
+                if (conteudo_bebidas.val() != "" && possuiItens) {
                     valida = true;
+                } else {
+                    valida = false;
                 }
             }
 
@@ -859,6 +900,19 @@
             return valida;
         }
 
+        const clicarComprar = function() {
+            $(btnComprar).click(function(e) {
+                e.preventDefault();
+                if (validacaoCarrinho()) {
+                    $(this).attr('disabled', 'disabled');
+                    salvarCookies();
+                    $(this).removeAttr('disabled');
+                    adicionadoAoCarrinho.fadeIn(300).delay(2300).fadeOut(200);
+                }
+            });
+        }
+
+
         finalizarPedido.click(function(e) {
             e.preventDefault();
             let este = this;
@@ -872,7 +926,6 @@
 
         fecharAba.click(fechaAbreRevisao);
         abrirRevisao.click(fechaAbreRevisao);
-
 
         clicarComprar();
         escondeExibeSalgado();

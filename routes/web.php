@@ -50,3 +50,4 @@ Route::get('/getTamanhos/{quantidade?}/{situacao?}', 'TamanhoController@getTaman
 Route::get('/getBebidas/', 'BebidaController@getBebidas')->name('getBebidas');
 Route::get('/getPizzas/', 'PizzaController@getPizzas')->name('getPizzas');
 Route::get('/getPizzasMaisPedidas/', 'PedidoController@getPizzasMaisPedidas')->name('getPizzasMaisPedidas');
+    

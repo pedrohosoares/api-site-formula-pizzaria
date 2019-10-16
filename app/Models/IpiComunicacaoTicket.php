@@ -47,12 +47,6 @@ class IpiComunicacaoTicket extends Eloquent
 		'cod_situacoes' => 'int'
 	];
 
-	protected $dates = [
-		'data_hora_ticket',
-		'data_prevista',
-		'data_prevista_analise'
-	];
-
 	protected $fillable = [
 		'cod_usuarios',
 		'cod_ticket_subcategorias',

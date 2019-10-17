@@ -55,3 +55,22 @@ Route::get('/ajaxIngredientesAdicionais/{cod_pizzarias}/{cod_tamanho}','PedidoCo
 
 //Login
 Route::post('/login-formula', 'LoginController@login_formula')->name('login_formula');
+
+
+//IFOOD
+Route::prefix('ifood')->group(function(){
+    Route::get('/ifood-token','IfoodController@oAuthToken')->name('ifood-token');
+    Route::get('/polling','IfoodController@polling')->name('polling');
+    Route::get('/view-access-token','IfoodController@view_access_token')->name('view_access_token');
+    
+    #CATEGORIAS
+    Route::get('/listar-categorias/{merchant_id}','IfoodController@listarCategorias')->name('listarCategorias');
+    Route::get('/cadastrar-categoria/{merchant_id}/{availability}/{name}/{order}/{template}/{externalCode}','IfoodController@cadastrar_categoria')->name('cadastrar_categoria');
+    Route::get('/alterar-categoria/{merchant_id}/{availability}/{name}/{order}/{template}/{externalCode}','IfoodController@alterarCategorias')->name('alterar_categorias');
+    #FIM CATEGORIAS
+
+    #ITENS
+    Route::get('/pega-itens/{merchant_id}/{id_categoria}','IfoodController@pegaItens')->name('pegaItens');
+    
+    #FIM ITENS
+});

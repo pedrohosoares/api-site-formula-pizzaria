@@ -93,4 +93,6 @@ class IpiPedidosBebida extends Eloquent
 	{
 		return $this->belongsTo(\App\Models\IpiBebidasIpiConteudo::class, 'cod_bebidas_ipi_conteudos');
 	}
+
+	
 }

@@ -42,4 +42,8 @@ class IpiPedidosFormasPg extends Eloquent
 		'prepago',
 		'pagamento_json'
 	];
+
+	public function ipi_formas_pgs(){
+		return $this->hasOne(\App\Models\IpiFormasPg::class,'cod_formas_pg','cod_formas_pg');
+	}
 }

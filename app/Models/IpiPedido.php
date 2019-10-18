@@ -230,6 +230,11 @@ class IpiPedido extends Eloquent
 		return $this->hasMany(\App\Models\IpiPedidosDetalhesPg::class, 'cod_pedidos');
 	}
 
+	public function ipi_pedidos_formas_pg()
+	{
+		return $this->hasMany(\App\Models\IpiPedidosFormasPg::class,'cod_pedidos');
+	}
+
 	public function ipi_cupons()
 	{
 		return $this->belongsToMany(\App\Models\IpiCupon::class, 'ipi_pedidos_ipi_cupons', 'cod_pedidos', 'cod_cupons');

@@ -64,6 +64,10 @@ class IpiPedidosFraco extends Eloquent
 					->where('ipi_pedidos_pizzas.cod_pedidos', '=', 'ipi_pedidos_fracoes.cod_pedidos');
 	}
 
+	public function ipi_pedidos_pizza_unico(){
+		return $this->hasOne(\App\Models\IpiPedidosPizza::class,'cod_pedidos_pizzas','cod_pedidos_pizzas');
+	}
+
 	public function ipi_pizza()
 	{
 		return $this->belongsTo(\App\Models\IpiPizza::class, 'cod_pizzas');

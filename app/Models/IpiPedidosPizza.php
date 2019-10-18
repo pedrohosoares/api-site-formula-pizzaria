@@ -49,6 +49,8 @@ class IpiPedidosPizza extends Eloquent
 {
 	public $timestamps = false;
 
+	protected $primaryKey = "cod_pedidos_pizzas";
+	
 	protected $casts = [
 		'cod_pedidos' => 'int',
 		'cod_tamanhos' => 'int',
@@ -123,5 +125,11 @@ class IpiPedidosPizza extends Eloquent
 	public function ipi_pedidos_fracos()
 	{
 		return $this->hasMany(\App\Models\IpiPedidosFraco::class, 'cod_pedidos_pizzas','cod_pedidos_pizzas');
+	}
+	public function ipi_tipo_massa(){
+		return $this->hasOne(\App\Models\IpiTipoMassa::class,'cod_tipo_massa','cod_tipo_massa');
+	}
+	public function ipi_opcoes_corte(){
+		return $this->hasOne(\App\Models\IpiOpcoesCorte::class,'cod_opcoes_corte','cod_opcoes_corte');
 	}
 }

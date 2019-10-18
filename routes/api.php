@@ -74,3 +74,20 @@ Route::prefix('ifood')->group(function(){
     
     #FIM ITENS
 });
+
+
+
+Route::prefix('cupons')->group(function(){
+    Route::get('/cupom-cozinha-ifood/{cod_pedido}','CuponsController@cupom_cozinha_ifood')->name('cupom_cozinha_ifood');
+    Route::get('/cupom-pedido-ifood/{cod_pedido}','CuponsController@cupom_pedido_ifood')->name('cupom_pedido_ifood');
+    
+    Route::get('/cupom-cozinha-tel/{cod_pedido}','CuponsController@cupom_cozinha_tel')->name('cupom_cozinha_tel');
+    Route::get('/cupom-pedido-tel/{cod_pedido}','CuponsController@cupom_pedido_tel')->name('cupom_pedido_tel');
+    
+    Route::get('/cupom-cancelado/{cod_pedido}','CuponsController@cupom_cancelado')->name('cupom_cancelado');
+});
+
+
+Route::prefix('pdf')->group(function(){
+    Route::get('/cria-pdf','PrintnodeController@cria_pdf')->name('cria_pdf');
+});

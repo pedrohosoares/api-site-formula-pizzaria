@@ -1,0 +1,134 @@
+[
+{
+    "itens":{
+        "bebidas":[
+            {
+                "nome":"Coca Cola 2 litros",
+                "tipo":"BEBIDA",
+                "tamanho":"",
+                "quantidade":2,
+                "pdv":"B2-2",
+                "preco_unitario":"10.00",
+                "preco_total":"20.00",
+                "desconto":"0",
+                "observacao":"Vir sem a tampa",
+                "origem_desconto":"RESTAURANTE"
+            }
+        ],
+        "comidas":[
+            {
+                "nome":"Pizza Mussarela gigante",
+                "tipo":"SALGADOS",
+                "tamanho":"T3",
+                "quantidade":2,
+                "pdv":"P2-3",
+                "preco_unitario":"10.00",
+                "preco_total":"20.00",
+                "desconto":"0",
+                "observacao":"Vir sem a tampa",
+                "origem_desconto":"RESTAURANTE",
+                "adicional":[
+                    {
+                        "nome":"Borda Catupiry",
+                        "tipo":"BORDA",
+                        "tamanho":"",
+                        "quantidade":1,
+                        "pdv":"B4-2",
+                        "preco_unitario":"10.00",
+                        "preco_total":"20.00",
+                        "desconto":"0",
+                        "observacao":"Vir sem a tampa",
+                        "origem_desconto":"RESTAURANTE"
+                    },
+                    {
+                        "nome":"Cebola",
+                        "tipo":"INGREDIENTE",
+                        "tamanho":"",
+                        "quantidade":1,
+                        "pdv":"I4",
+                        "preco_unitario":"3.00",
+                        "preco_total":"2.00",
+                        "desconto":"0",
+                        "observacao":"Vir com casca",
+                        "origem_desconto":""
+                    }
+                ]
+            },
+            {
+                "nome":"Pizza Mussarela gigante",
+                "tipo":"SALGADOS",
+                "tamanho":"T3",
+                "quantidade":2,
+                "pdv":"P2-3",
+                "preco_unitario":"10.00",
+                "preco_total":"20.00",
+                "desconto":"0",
+                "observacao":"Vir sem a tampa",
+                "origem_desconto":"RESTAURANTE",
+                "adicional":[
+                    {
+                        "nome":"Borda Catupiry",
+                        "tipo":"BORDA",
+                        "tamanho":"",
+                        "quantidade":1,
+                        "pdv":"B4-2",
+                        "preco_unitario":"10.00",
+                        "preco_total":"20.00",
+                        "desconto":"0",
+                        "observacao":"Vir sem a tampa",
+                        "origem_desconto":"RESTAURANTE"
+                    },
+                    {
+                        "nome":"Cebola",
+                        "tipo":"INGREDIENTE",
+                        "tamanho":"",
+                        "quantidade":1,
+                        "pdv":"I4",
+                        "preco_unitario":"3.00",
+                        "preco_total":"2.00",
+                        "desconto":"0",
+                        "observacao":"Vir com casca",
+                        "origem_desconto":""
+                    }
+                ]
+            }
+        ],
+        "pagamento":[
+            {
+                "nome":"MASTERCARD",
+                "metodo":"DEBITO",
+                "valor":"1.00",
+                "prepago":true,
+                "desconto":true,
+                "dono":"restaurante"
+            },
+            {
+                "nome":"MASTERCARD",
+                "metodo":"CREDITO",
+                "valor":"12.00",
+                "prepago":false,
+                "desconto":false,
+                "dono":"restaurante"
+            },
+            {
+                "nome":"DESCONTO",
+                "metodo":"DESCONTO",
+                "valor":"3.40",
+                "prepago":true,
+                "desconto":true,
+                "dono":"plataforma"
+            },
+            {
+                "nome":"CUPOM",
+                "metodo":"CUPOM",
+                "valor":"5.40",
+                "prepago":true,
+                "desconto":true,
+                "dono":"plataforma"
+            }
+        ],
+        "preco_total":"100.00",
+        "frete":"0"
+    },
+}
+]

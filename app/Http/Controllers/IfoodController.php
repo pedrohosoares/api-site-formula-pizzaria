@@ -6,10 +6,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 
+use App\Models\IpiCliente;
+use App\Models\IpiEndereco;
+use App\Models\IpiPedido;
+use App\Models\IpiPizzaria;
+use App\Models\IpiPedidosFormasPg;
+
 class IfoodController extends Controller
 {
 
-
+    /**
+     * Loja teste
+     * https://www.ifood.com.br/delivery/bujari-ac/teste-formula-system-bujari/68bb790f-e24f-4666-ad64-86baf9ca2337
+     */
     /*
         A API é baseado no OPAuth2
         @client_id
@@ -28,12 +37,19 @@ class IfoodController extends Controller
     public $merchant_id;
     //DADOS DE PEDIDO ESPECIFICO DO IFOOD
     public $order;
+    public $createdAt;
     //REFERENCIA DO PEDIDO
     public $correlationid;
     public $externalCode;
+    public $paymentSerialize = '';
 
     public $polling;
-    public $acknowledgment;
+    public $acknowledgment = array();
+    public $cod_clientes;
+    public $cod_enderecos;
+    public $cod_pedidos;
+    public $cod_pizzarias;
+    public $discount = 0.00;
 
     //CURL CRUDE DATA
     public $curlUrl;
@@ -45,20 +61,23 @@ class IfoodController extends Controller
     public $curlPostData;
     public $curlPut = false;
 
-    public function __construct(Request $request){
+    public function __construct(Request $request)
+    {
         $this->leAccessToken();
     }
 
-    protected function verificaHttp(){
+    protected function verificaHttp()
+    {
         $retorno = false;
-        if($this->curlHttp == 401){
+        if ($this->curlHttp == 401) {
             $retorno = true;
         }
         return $retorno;
     }
 
-    protected function renovaToken(){
-        if($this->curlHttp == 401){
+    protected function renovaToken()
+    {
+        if ($this->curlHttp == 401) {
             $this->oAuthToken();
         }
     }
@@ -70,10 +89,10 @@ class IfoodController extends Controller
         curl_setopt($ch, CURLOPT_URL, $this->curlUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, $this->curlType);
-        if(!empty($this->curlPostData)){
+        if (!empty($this->curlPostData)) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $this->curlPostData);
         }
-        if($this->curlPut){
+        if ($this->curlPut) {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST,  'PUT');
         }
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
@@ -89,26 +108,29 @@ class IfoodController extends Controller
         try {
             Storage::put('ifood/token.txt', $this->access_token);
             $salvo = true;
+            $this->access_token = json_decode($this->access_token);
+            $this->access_token = $this->access_token['access_token'];
         } catch (\Throwable $th) { }
         return $salvo;
     }
 
-    public function view_access_token(){
+    public function view_access_token()
+    {
         dump(Storage::disk("local")->exists('ifood/token.txt'));
     }
 
     public function leAccessToken()
     {
         $existeArquivo = Storage::disk("local")->exists('ifood/token.txt');
-        if($existeArquivo){
+        if ($existeArquivo) {
             $token = File::get(storage_path('app/ifood/token.txt'));
             $token = json_decode($token, true);
             if (isset($token['access_token'])) {
                 $this->access_token = $token['access_token'];
-            }else{
-                $this->oAuthToken();    
+            } else {
+                $this->oAuthToken();
             }
-        }else{
+        } else {
             $this->oAuthToken();
         }
     }
@@ -116,6 +138,7 @@ class IfoodController extends Controller
     //AUTENTICA NO IFOOD
     public function oAuthToken()
     {
+        $this->curlType = 1;
         $this->curlDataPass = 'client_id=' . $this->client_id . '&client_secret=' . $this->client_secret . '&username=' . $this->username . '&password=' . $this->password . '&grant_type=' . $this->grant_type;
         $this->curlUrl = "https://pos-api.ifood.com.br/oauth/token?" . $this->curlDataPass;
         $this->curlPost();
@@ -126,24 +149,182 @@ class IfoodController extends Controller
         }
     }
 
-    //VERIFICA PEDIDOS DE UM CORRELATION ID
+    /**
+     * Pedidos 
+     */
+
+    /**
+     *  Envia o ID dos pedidos para remove-los da lista
+     */
+    public function acknowledgment(){
+        $this->curlType = 1;
+        $this->curlDataPass = $this->acknowledgment;
+        $this->curlUrl = 'https://pos-api.ifood.com.br/v1.0/events/acknowledgment/?access_token=' . $this->access_token;
+        $this->curlPost();
+    }
+
+    protected function registraCliente(){
+        
+        $this->order['customer']['taxPayerIdentificationNumber'] = isset($this->order['customer']['taxPayerIdentificationNumber'])?$this->order['customer']['taxPayerIdentificationNumber']:"";
+        $this->order['customer']['name'] = isset($this->order['customer']['name'])?$this->order['customer']['name']:"";
+        dd($this->order);
+        $cliente = array(
+            'cod_onde_conheceu'=>'10',
+            'nome'=>$this->order['customer']['name'],
+            'email'=>'',
+            'cpf'=>$this->order['customer']['taxPayerIdentificationNumber'],
+            'celular'=>$this->order['customer']['phone'],
+            'observacao'=>'CADASTRADO PELO IFOOD',
+            'sexo'=>'',
+            'origem_cliente'=>'IFOOD',
+            'data_hora_cadastro'=>date('Y-m-d H:i:s'),
+            'situacao'=>'ATIVO'
+        );
+
+        $cliente = IpiCliente::updateOrCreate(
+            ['id_ifood_cliente'=>$this->order['customer']['id']],
+            $cliente
+        );
+
+        $endereco = array(
+            'apelido'=>'Endereço Padrão',
+            'endereco'=>$this->order['deliveryAddress']['streetName'],
+            'numero'=>$this->order['deliveryAddress']['streetNumber'],
+            'complemento'=>$this->order['deliveryAddress']['complement'],
+            'bairro'=>$this->order['deliveryAddress']['neighborhood'],
+            'cidade'=>$this->order['deliveryAddress']['city'],
+            'estado'=>$this->order['deliveryAddress']['state'],
+            'cep'=>$this->order['deliveryAddress']['postalCode'],
+            'telefone_1'=>$this->order['customer']['phone'],
+            'telefone_2'=>$this->order['customer']['phone'],
+            'edificio'=>'',
+            'referencia_endereco'=>$this->order['deliveryAddress']['reference'],
+            'referencia_cliente'=>'',
+            'obs_endereco'=>$this->order['deliveryAddress']['reference']
+        );
+        $endereco = IpiEndereco::updateOrCreate(
+            ['cod_clientes'=>$cliente->cod_clientes],
+            $endereco
+        );
+        $this->cod_enderecos = $endereco->cod_enderecos;
+        $this->cod_clientes = $cliente->cod_clientes;
+    }
+
+    protected function cadastraPedido(){
+        
+        $dadosBD = array(
+            'polling'=>$this->polling,
+            'reference'=>$this->correlationid,
+            'order'=>$this->order
+        );
+
+        $dadosBD = json_encode($dadosBD,true);
+        
+        $pedido = IpiPedido::create(
+            [
+                'cod_clientes'=>$this->cod_clientes,
+                'cod_pizzarias'=>$this->cod_pizzarias,
+                'cod_usuarios_pedido'=>$this->cod_clientes,
+                'data_hora_pedido'=>$this->createdAt,
+                'valor'=>$this->order['subTotal'],
+                'valor_entrega'=>$this->order['deliveryFee'],
+                'valor_comissao_frete'=>'',
+                'desconto'=>'0.00',
+                'valor_total'=>$this->order['totalPrice'],
+                'situacao'=>'NOVO',
+                'forma_pg'=>'',
+                'nome_cliente'=>$this->order['customer']['name'],
+                'endereco'=>$this->order['deliveryAddress']['endereco'],
+                'numero'=>$this->order['deliveryAddress']['streetNumber'],
+                'complemento'=>$this->order['deliveryAddress']['complement'],
+                'bairro'=>$this->order['deliveryAddress']['neighborhood'],
+                'cidade'=>$this->order['deliveryAddress']['city'],
+                'estado'=>$this->order['deliveryAddress']['state'],
+                'cep'=>$this->order['deliveryAddress']['postalCode'],
+                'telefone_1'=>$this->order['customer']['phone'],
+                'telefone_2'=>$this->order['customer']['phone'],
+                'referencia_endereco'=>$this->order['deliveryAddress']['complement'],
+                'referencia_endereco'=>$this->order['deliveryAddress']['complement'],
+                'tipo_entrega'=>'Entrega',
+                'horario_agendamento'=>'00:00:00',
+                'origem_pedido'=>'IFOOD',
+                'obs_pedido'=>'Pedido feito pelo IFOOD',
+                'data_hora_inicial'=>$this->createdAt,
+                'cpf'=>$this->order['customer']['taxPayerIdentificationNumber'],
+                'ifood_polling'=>$this->order['reference'],
+                'ifood_status'=>'INICIO',
+                'pedido_ifood_json'=>$dadosBD,
+                'pedido_integrado'=>'1'
+            ]
+        );
+    }
+
+    /**
+     * PROCESSA PAGAMENTO
+     */
+    public function processaPagamentos(){
+        
+        $pagamentos = $this->order['payments'];
+        foreach($pagamentos as $i=>$v){
+            $dadosPagamentos[] = array(
+                'cod_pedidos'=>$this->cod_pedidos,
+                'valor'=>$v['value'],
+                'prepago'=>$v['prepaid'],
+                'pagamento_json'=>json_encode($v,true)
+            );     
+            $this->paymentSerialize .= $v['name'].', '; 
+        }
+        
+        IpiPedidosFormasPg::createMany($dadosPagamentos);
+        
+        /**
+         * ATUALIZA ipi_pedidos
+         */
+        $pedidos = IpiPedido::where('cod_pedidos',$this->cod_pedidos);
+        $pedidos->forma_pg = $this->paymentSerialize;
+        $pedidos->save();
+        
+        $this->paymentSerialize = substr($this->paymentSerialize,strlen($this->paymentSerialize)-1,strlen($this->paymentSerialize));
+    
+    }
+
+    /**
+     * RECUPERA PIZZARIA
+     */
+    protected function recuperaPizzaria(){
+        $pizzaria = IpiPizzaria::select('cod_pizzarias')->where('merchant_id','LIKE','%'.$this->merchant_id.'%')->first();
+        $this->cod_pizzarias = $pizzaria->cod_pizzarias;
+    }
+
+    /** 
+     * VERIFICA PEDIDOS DE UM CORRELATION ID
+     */
     public function orders()
     {
         $this->curlUrl = 'https://pos-api.ifood.com.br/v2.0/orders/' . $this->correlationid . '?access_token=' . $this->access_token;
         $this->curlPost();
-        $this->curlBody = json_decode($this->curlBody, true);
+        $this->order = json_decode($this->curlBody, true);
+        $this->merchant_id = $this->order['merchant']['shortId'];
+        $this->recuperaPizzaria();
+        #$dadosBD = '{"polling":[{"id":"22323f72-842f-455c-979b-5fa6d56acfb5","code":"PLACED","correlationId":"6193176434464066","createdAt":"2019-10-21T15:44:40.409Z"}],"reference":"6193176434464066","order":{"id":"c2976349-3665-4a25-b4ab-453363683b69","reference":"6193176434464066","shortReference":"5728","createdAt":"2019-10-21T15:44:39.902Z","scheduled":false,"type":"DELIVERY","merchant":{"id":"68bb790f-e24f-4666-ad64-86baf9ca2337","shortId":"208040","name":"TESTE Formula System","address":{"formattedAddress":"RAMAL BUJARI","country":"BR","state":"AC","city":"BUJARI","neighborhood":"bujari","streetName":"RAMAL BUJARI","streetNumber":"123","postalCode":"69923000"}},"payments":[{"name":"D\u00c9BITO - MASTERCARD (M\u00c1QUINA)","code":"MEREST","value":89.6,"prepaid":false}],"customer":{"id":"109125238","name":"PEDIDO DE TESTE - Pedro Henrique","taxPayerIdentificationNumber":"11427599629","phone":"0800 007 0110 ID: 20787445","ordersCountOnRestaurant":0},"items":[{"id":"eaa65d78-0720-4d9f-ad25-83c23a24efe7","name":"PEDIDO DE TESTE - Pizza novo cadastro de adicional","quantity":1,"price":0,"subItemsPrice":69.6,"totalPrice":69.6,"discount":0,"addition":0,"externalCode":"H","subItems":[{"id":"e5fe43a7-12f7-40d8-9e50-9e5d4bc962cb","name":"Borda Catupiry","quantity":1,"price":6,"totalPrice":6,"discount":0,"addition":0,"externalCode":"R1"},{"id":"3cd9379b-a491-464d-a499-2aa8e42ff917","name":"Bacon","quantity":1,"price":4,"totalPrice":4,"discount":0,"addition":0},{"id":"11e1da52-6715-4cdc-8250-3db2668c20f4","name":"Fanta","quantity":1,"price":10.9,"totalPrice":10.9,"discount":0,"addition":0},{"id":"da7c8e85-8f76-4df9-a464-afab54e23ad9","name":"2 mousses","quantity":1,"price":13.8,"totalPrice":13.8,"discount":0,"addition":0},{"id":"7a66574b-259f-46db-ad2d-9d6b554e65d9","name":"4 queijos","quantity":1,"price":16.45,"totalPrice":16.45,"discount":0,"addition":0},{"id":"fefcccfd-604b-4b9a-90a2-c9023bae6958","name":"A moda","quantity":1,"price":18.45,"totalPrice":18.45,"discount":0,"addition":0}]}],"subTotal":69.6,"totalPrice":89.6,"deliveryFee":20,"deliveryAddress":{"formattedAddress":"PEDIDO DE TESTE - N\u00c3O ENTREGAR - R. Divina Luz, 61","country":"BR","state":"AC","city":"Bujari","coordinates":{"latitude":-9.825868,"longitude":-67.948632},"neighborhood":"Amendoa","streetName":"PEDIDO DE TESTE - N\u00c3O ENTREGAR - R. Divina Luz","streetNumber":"61","postalCode":"00000000","reference":"Em cima do poste","complement":"Bloco"},"deliveryDateTime":"2019-10-21T16:04:39.902Z","preparationStartDateTime":"2019-10-21T15:44:39.902Z","localizer":{"id":"20787445"},"preparationTimeInSeconds":0,"isTest":true}}';
+        $this->registraCliente();
+        $this->cadastraPedido();
+        $this->processaPagamentos();
     }
 
-    public function proccessaDados()
+    public function proccessaPolling()
     {
         foreach ($this->polling as $i => $v) {
+            $this->correlationid = $v['correlationId'];
+            $this->createdAt = date('Y-m-d H:i:s',strtotime($v['createdAt']));
             if ($v['code'] == 'PLACED') {
-                $this->correlationid = $v['correlationId'];
                 $this->orders();
-                $json = json_decode($this->curlBody, true);
-                $this->merchant_id = $json['merchant']['id'];
+            }else{
+                //Outros status
             }
+            $this->acknowledgment[] = array('id'=>$this->correlationid);
         }
+        //$this->acknowledgment();
     }
 
     public function polling()
@@ -152,10 +333,15 @@ class IfoodController extends Controller
         $this->curlUrl = 'https://pos-api.ifood.com.br/v1.0/events%3Apolling?access_token=' . $this->access_token;
         $this->curlType = 0;
         $this->curlPost();
-        if ($this->curlHttp != 404) {
-            $this->polling = json_decode($this->curlBody);
+            
+        if (!empty($this->curlBody) and ($this->curlHttp == 200) or $this->curlHttp == 201) {
+            //"[{"id":"bee06149-1c26-4bf1-aef3-6983ea65c590","code":"PLACED","correlationId":"3199106436775033","createdAt":"2019-10-21T15:13:40.841Z"}]"
+            $this->polling = json_decode($this->curlBody,true);
+            $this->proccessaPolling();
         } else {
-            $this->oAuthToken();
+            if ($this->curlHttp != 404) {
+                $this->oAuthToken();
+            }
         }
     }
 
@@ -175,7 +361,7 @@ class IfoodController extends Controller
 
     ########################## CATEGORIAS #############################
 
-    
+
     public $categoria;
     public $availability;
     public $categoriesName;
@@ -186,24 +372,25 @@ class IfoodController extends Controller
     protected function addCategoria()
     {
         $this->curlType = 1;
-        $this->curlUrl = "https://pos-api.ifood.com.br/v1.0/categories?access_token=".$this->access_token;
-        $this->categoriesName = str_replace('-',' ',$this->categoriesName);
+        $this->curlUrl = "https://pos-api.ifood.com.br/v1.0/categories?access_token=" . $this->access_token;
+        $this->categoriesName = str_replace('-', ' ', $this->categoriesName);
         $this->curlPostData = array(
-            "merchantId"=>$this->merchant_id,
-            "availability"=>$this->availability,
-            "name"=>$this->categoriesName,
-            "order"=>$this->categoriesOrder,
-            "template"=>$this->template,
-            "externalCode"=>$this->externalCode
+            "merchantId" => $this->merchant_id,
+            "availability" => $this->availability,
+            "name" => $this->categoriesName,
+            "order" => $this->categoriesOrder,
+            "template" => $this->template,
+            "externalCode" => $this->externalCode
         );
         $this->curlHeader = array(
             "Content-Type: application/json"
         );
-        $this->curlPostData = json_encode($this->curlPostData,true);
+        $this->curlPostData = json_encode($this->curlPostData, true);
         $this->curlPost();
     }
 
-    public function cadastrar_categoria($merchant_id,$availability,$name,$order,$template,$externalCode){
+    public function cadastrar_categoria($merchant_id, $availability, $name, $order, $template, $externalCode)
+    {
         $this->merchant_id = $merchant_id;
         $this->availability = $availability;
         $this->categoriesName = $name;
@@ -212,33 +399,34 @@ class IfoodController extends Controller
         $this->externalCode = $externalCode;
         $this->addCategoria();
         //Se o token estiver errado
-        if($this->verificaHttp()){
+        if ($this->verificaHttp()) {
             $this->oAuthToken();
             $this->addCategoria();
         }
     }
 
-    public function listarCategorias($merchant_id){
-        if(empty($this->merchant_id)){
+    public function listarCategorias($merchant_id)
+    {
+        if (empty($this->merchant_id)) {
             $this->merchant_id = $merchant_id;
         }
-        $this->curlType = 1;
-        $this->curlUrl = "https://pos-api.ifood.com.br/v1.0/merchants/".$this->merchant_id."/menus/categories?access_token=".$this->access_token;
+        $this->curlType = 0;
+        $this->curlUrl = "https://pos-api.ifood.com.br/v1.0/merchants/" . $this->merchant_id . "/menus/categories?access_token=" . $this->access_token;
         $this->curlPost();
-        dump($this->curlBody);
-        $this->curlBody = json_decode($this->curlBody,true);
-        if(isset($this->curlBody['error'])){
-            $this->oAuthToken();        
-            $this->curlUrl = "https://pos-api.ifood.com.br/v1.0/merchants/".$this->merchant_id."/menus/categories?access_token=".$this->access_token;
+        $this->curlBody = json_decode($this->curlBody, true);
+        if (isset($this->curlBody['error'])) {
+            $this->oAuthToken();
+
+            $this->curlUrl = "https://pos-api.ifood.com.br/v1.0/merchants/" . $this->merchant_id . "/menus/categories?access_token=" . $this->access_token;
             $this->curlPost();
-            $this->curlBody = json_decode($this->curlBody,true);
+            $this->curlBody = json_decode($this->curlBody, true);
         }
-        dump($this->curlBody);
-        return json_encode($this->curlBody,true);
+        return json_encode($this->curlBody, true);
     }
 
     //COM PROBLEMA
-    public function alterarCategorias($merchant_id,$availability,$name,$order,$template,$externalCode){
+    public function alterarCategorias($merchant_id, $availability, $name, $order, $template, $externalCode)
+    {
         $this->curlPut = true;
         $this->merchant_id = $merchant_id;
         $this->availability = $availability;
@@ -248,8 +436,8 @@ class IfoodController extends Controller
         $this->externalCode = $externalCode;
         $this->addCategoria();
         //Se o token estiver errado
-        $this->curlBody = json_decode($this->curlBody,true);
-        if(isset($this->curlBody['error'])){
+        $this->curlBody = json_decode($this->curlBody, true);
+        if (isset($this->curlBody['error'])) {
             $this->oAuthToken();
             $this->addCategoria();
         }
@@ -259,18 +447,13 @@ class IfoodController extends Controller
 
     ############################## FIM CATEGORIAS #################################
 
-    public function pegaItens($merchant_id,$categoria_id){
+    public function pegaItens($merchant_id, $categoria_id)
+    {
         $this->merchant_id = $merchant_id;
         $this->categoriesId = $categoria_id;
-        $this->curlUrl = "https://pos-api.ifood.com.br/v1.0/merchants/".$this->merchant_id."/menus/categories/".$this->categories;
+        $this->curlUrl = "https://pos-api.ifood.com.br/v1.0/merchants/" . $this->merchant_id . "/menus/categories/" . $this->categories;
         $this->curlPost();
-        $this->curlBody = json_decode($this->curlBody,true);
-        if(isset($this->curlBody['error'])){
-
-        }
+        $this->curlBody = json_decode($this->curlBody, true);
+        if (isset($this->curlBody['error'])) { }
     }
-
-
-
-
 }

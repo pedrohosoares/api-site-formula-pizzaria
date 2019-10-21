@@ -39,11 +39,13 @@ Route::get('/peddings/sendStatus/{token}/{field}/{status}/{id}','PedidoControlle
 
 //TICKETS
 Route::prefix('tickets')->group(function(){
+    
     Route::get('/categorias','TicketsController@retornaCategoria');
     Route::get('/situacoes','TicketsController@retornaSituacoes');
     Route::get('/tickets','TicketsController@recuperaTicket');
     Route::post('/criar_tickets','TicketsController@insereTicket');
     Route::match(['put'],'/alterar_categoria/{cod_categorias}','TicketsController@alteraCategoria');
+
 });
 
 
@@ -59,6 +61,7 @@ Route::post('/login-formula', 'LoginController@login_formula')->name('login_form
 
 //IFOOD
 Route::prefix('ifood')->group(function(){
+    //Merchant teste 208040
     Route::get('/ifood-token','IfoodController@oAuthToken')->name('ifood-token');
     Route::get('/polling','IfoodController@polling')->name('polling');
     Route::get('/view-access-token','IfoodController@view_access_token')->name('view_access_token');
@@ -73,11 +76,13 @@ Route::prefix('ifood')->group(function(){
     Route::get('/pega-itens/{merchant_id}/{id_categoria}','IfoodController@pegaItens')->name('pegaItens');
     
     #FIM ITENS
+
 });
 
 
 
 Route::prefix('cupons')->group(function(){
+
     Route::get('/cupom-cozinha-ifood/{cod_pedido}','CuponsController@cupom_cozinha_ifood')->name('cupom_cozinha_ifood');
     Route::get('/cupom-pedido-ifood/{cod_pedido}','CuponsController@cupom_pedido_ifood')->name('cupom_pedido_ifood');
     
@@ -85,9 +90,5 @@ Route::prefix('cupons')->group(function(){
     Route::get('/cupom-pedido-tel/{cod_pedido}','CuponsController@cupom_pedido_tel')->name('cupom_pedido_tel');
     
     Route::get('/cupom-cancelado/{cod_pedido}','CuponsController@cupom_cancelado')->name('cupom_cancelado');
-});
 
-
-Route::prefix('pdf')->group(function(){
-    Route::get('/cria-pdf','PrintnodeController@cria_pdf')->name('cria_pdf');
 });

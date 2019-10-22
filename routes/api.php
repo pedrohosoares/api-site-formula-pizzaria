@@ -75,6 +75,7 @@ Route::prefix('ifood')->group(function(){
     #ITENS
     Route::get('/pega-itens/{merchant_id}/{id_categoria}','IfoodController@pegaItens')->name('pegaItens');
     
+    Route::match(['post','get'],'/cadastra-produto','IfoodController@cadastraProdutos')->name('cadastra_produto');
     #FIM ITENS
 
 });
@@ -91,4 +92,8 @@ Route::prefix('cupons')->group(function(){
     
     Route::get('/cupom-cancelado/{cod_pedido}','CuponsController@cupom_cancelado')->name('cupom_cancelado');
 
+});
+
+Route::prefix('notas')->group(function(){
+    Route::get('/hello','FocusNfeController@hello');
 });

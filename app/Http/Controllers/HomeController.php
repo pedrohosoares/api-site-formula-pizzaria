@@ -45,4 +45,8 @@ class HomeController extends Controller
     public function loja(){
         
     }
+
+    public function hello2(){
+        echo 'hello2';
+    }
 }

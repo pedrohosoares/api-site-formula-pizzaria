@@ -31,8 +31,8 @@ class IpiPedidosFormasPg extends Eloquent
 		'cod_pedidos' => 'int',
 		'cod_formas_pg' => 'int',
 		'valor' => 'float',
-		'prepago' => 'int',
-		'pagamento_json' => 'json'
+		'prepago' => 'int'
+		#'pagamento_json' => 'json'
 	];
 
 	protected $fillable = [

@@ -127,6 +127,7 @@ class IpiPedido extends Eloquent
 	];
 
 	protected $dates = [
+		/*
 		'data_hora_pedido',
 		'data_hora_baixa',
 		'data_hora_cancelamento',
@@ -136,6 +137,7 @@ class IpiPedido extends Eloquent
 		'data_hora_final',
 		'data_captura_manual',
 		'data_fiscal_manual'
+		*/
 	];
 
 	protected $fillable = [
@@ -203,7 +205,8 @@ class IpiPedido extends Eloquent
 		'ifood_polling',
 		'pedido_ifood_json',
 		'status_nota',
-		'ifood_status'
+		'ifood_status',
+		'pedido_integrado'
 	];
 
 	public function ipi_pizzaria(){

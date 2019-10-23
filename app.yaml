@@ -1,0 +1,9 @@
+runtime: php
+env: flex
+runtime_config:
+  document_root: public
+
+env_variables:
+  # Put production environment variables here.
+  APP_LOG: errorlog
+  APP_KEY: base64:vA6NpNXmJUR4Qoh0mhNit+oKBqe/xcsFi1lu03oRWrg=

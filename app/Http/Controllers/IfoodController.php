@@ -50,6 +50,7 @@ class IfoodController extends Controller
     public $cod_enderecos;
     public $cod_pedidos;
     public $cod_pizzarias;
+    public $reference;
     public $discount = 0.00;
 
     //CURL CRUDE DATA
@@ -60,6 +61,7 @@ class IfoodController extends Controller
     public $curlHeader = array();
     public $curlType = 1; //1 para POST 0 para GET
     public $curlPostData;
+    public $curlReturnTransfer = 1;
     public $curlPut = false;
 
     public function __construct(Request $request)
@@ -88,13 +90,13 @@ class IfoodController extends Controller
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_ENCODING, '');
         curl_setopt($ch, CURLOPT_URL, $this->curlUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, $this->curlReturnTransfer);
         curl_setopt($ch, CURLOPT_POST, $this->curlType);
         if (!empty($this->curlPostData)) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $this->curlPostData);
         }
-        if(!empty($this->curlHeader)){
-            curl_setopt( $ch, CURLOPT_HEADER, 1);
+        if (!empty($this->curlHeader)) {
+            curl_setopt($ch, CURLOPT_HEADER, 1);
         }
         if ($this->curlPut) {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST,  'PUT');
@@ -146,7 +148,6 @@ class IfoodController extends Controller
         $this->curlDataPass = 'client_id=' . $this->client_id . '&client_secret=' . $this->client_secret . '&username=' . $this->username . '&password=' . $this->password . '&grant_type=' . $this->grant_type;
         $this->curlUrl = "https://pos-api.ifood.com.br/oauth/token?" . $this->curlDataPass;
         $this->curlPost();
-        dump($this->curlHttp);
         if ($this->curlHttp == 200) {
             //SALVAR ACCESS_TOKEN
             $this->access_token = $this->curlBody;
@@ -164,8 +165,13 @@ class IfoodController extends Controller
     public function acknowledgment()
     {
         $this->curlType = 1;
-        $this->curlDataPass = $this->acknowledgment;
-        $this->curlUrl = 'https://pos-api.ifood.com.br/v1.0/events/acknowledgment/?access_token=' . $this->access_token;
+        $this->curlDataPass = json_encode($this->acknowledgment, true);
+        $this->curlUrl = 'https://pos-api.ifood.com.br/v1.0/events/acknowledgment/';
+        $this->curlHeader = array(
+            'Authorization: bearer ' . $this->access_token,
+            'Cache-Control: no-cache',
+            'Content-Type: application/json',
+        );
         $this->curlPost();
     }
 
@@ -191,6 +197,8 @@ class IfoodController extends Controller
             ['id_ifood_cliente' => $this->order['customer']['id']],
             $cliente
         );
+        $this->order['deliveryAddress']['reference'] = isset($this->order['deliveryAddress']['reference']) ? $this->order['deliveryAddress']['reference'] : "";
+        $this->order['deliveryAddress']['complement'] = isset($this->order['deliveryAddress']['complement']) ? $this->order['deliveryAddress']['complement'] : "";
         $endereco = array(
             'apelido' => 'Endereço Padrão',
             'endereco' => $this->order['deliveryAddress']['streetName'],
@@ -266,6 +274,11 @@ class IfoodController extends Controller
         $this->cod_pedidos = $pedido->cod_pedidos;
     }
 
+    protected function executaCommando()
+    {
+        //exec('wkhtmltopdf --page-width 80mm --page-height 250mm --margin-left 0mm --margin-right 0mm '.$this->url);
+    }
+
     /**
      * CADASTRA NOVO MEIO PAGAMENTO
      */
@@ -332,11 +345,14 @@ class IfoodController extends Controller
         $this->curlPost();
         $this->order = json_decode($this->curlBody, true);
         $this->merchant_id = $this->order['merchant']['shortId'];
+        $this->reference = $this->order['reference'];
         $this->recuperaPizzaria();
         #$dadosBD = '{"polling":[{"id":"22323f72-842f-455c-979b-5fa6d56acfb5","code":"PLACED","correlationId":"6193176434464066","createdAt":"2019-10-21T15:44:40.409Z"}],"reference":"6193176434464066","order":{"id":"c2976349-3665-4a25-b4ab-453363683b69","reference":"6193176434464066","shortReference":"5728","createdAt":"2019-10-21T15:44:39.902Z","scheduled":false,"type":"DELIVERY","merchant":{"id":"68bb790f-e24f-4666-ad64-86baf9ca2337","shortId":"208040","name":"TESTE Formula System","address":{"formattedAddress":"RAMAL BUJARI","country":"BR","state":"AC","city":"BUJARI","neighborhood":"bujari","streetName":"RAMAL BUJARI","streetNumber":"123","postalCode":"69923000"}},"payments":[{"name":"D\u00c9BITO - MASTERCARD (M\u00c1QUINA)","code":"MEREST","value":89.6,"prepaid":false}],"customer":{"id":"109125238","name":"PEDIDO DE TESTE - Pedro Henrique","taxPayerIdentificationNumber":"11427599629","phone":"0800 007 0110 ID: 20787445","ordersCountOnRestaurant":0},"items":[{"id":"eaa65d78-0720-4d9f-ad25-83c23a24efe7","name":"PEDIDO DE TESTE - Pizza novo cadastro de adicional","quantity":1,"price":0,"subItemsPrice":69.6,"totalPrice":69.6,"discount":0,"addition":0,"externalCode":"H","subItems":[{"id":"e5fe43a7-12f7-40d8-9e50-9e5d4bc962cb","name":"Borda Catupiry","quantity":1,"price":6,"totalPrice":6,"discount":0,"addition":0,"externalCode":"R1"},{"id":"3cd9379b-a491-464d-a499-2aa8e42ff917","name":"Bacon","quantity":1,"price":4,"totalPrice":4,"discount":0,"addition":0},{"id":"11e1da52-6715-4cdc-8250-3db2668c20f4","name":"Fanta","quantity":1,"price":10.9,"totalPrice":10.9,"discount":0,"addition":0},{"id":"da7c8e85-8f76-4df9-a464-afab54e23ad9","name":"2 mousses","quantity":1,"price":13.8,"totalPrice":13.8,"discount":0,"addition":0},{"id":"7a66574b-259f-46db-ad2d-9d6b554e65d9","name":"4 queijos","quantity":1,"price":16.45,"totalPrice":16.45,"discount":0,"addition":0},{"id":"fefcccfd-604b-4b9a-90a2-c9023bae6958","name":"A moda","quantity":1,"price":18.45,"totalPrice":18.45,"discount":0,"addition":0}]}],"subTotal":69.6,"totalPrice":89.6,"deliveryFee":20,"deliveryAddress":{"formattedAddress":"PEDIDO DE TESTE - N\u00c3O ENTREGAR - R. Divina Luz, 61","country":"BR","state":"AC","city":"Bujari","coordinates":{"latitude":-9.825868,"longitude":-67.948632},"neighborhood":"Amendoa","streetName":"PEDIDO DE TESTE - N\u00c3O ENTREGAR - R. Divina Luz","streetNumber":"61","postalCode":"00000000","reference":"Em cima do poste","complement":"Bloco"},"deliveryDateTime":"2019-10-21T16:04:39.902Z","preparationStartDateTime":"2019-10-21T15:44:39.902Z","localizer":{"id":"20787445"},"preparationTimeInSeconds":0,"isTest":true}}';
         $this->registraCliente();
         $this->cadastraPedido();
         $this->processaPagamentos();
+        $this->integration();
+        $this->confirmation();
     }
 
     public function proccessaPolling()
@@ -347,6 +363,9 @@ class IfoodController extends Controller
             if ($v['code'] == 'PLACED') {
                 $this->orders();
             } else {
+                //CANCELLATION_REQUESTED
+                //CANCELLED
+                //CANCELLATION_REQUEST_FAILED
                 //Outros status
             }
             $this->acknowledgment[] = array('id' => $this->correlationid);
@@ -517,7 +536,7 @@ class IfoodController extends Controller
         $this->curlDataPass = $dados;
         $this->curlHeader = array(
             "Content-Type: multipart/form-data",
-            "Authorization: Bearer ".$this->access_token
+            "Authorization: Bearer " . $this->access_token
         );
         $this->curlPost();
     }
@@ -530,7 +549,116 @@ class IfoodController extends Controller
             $this->oAuthToken();
             $this->addProdutos();
         }
-        dump($this->access_token);
-        dump($this->curlHttp);
+    }
+
+    public function readyToDelivery()
+    {
+        $this->curlType = 1;
+        $this->curlUrl = 'https://pos-api.ifood.com.br/v2.0/orders/' . $this->reference . '/statuses/readyToDeliver';
+        $this->curlHeader = array(
+            'Authorization: bearer ' . $this->access_token,
+            'Cache-Control: no-cache',
+            'Content-Type: application/json',
+        );
+        $this->curlPost();
+    }
+
+
+    /**
+     * CANCELLATION REQUESTED
+     */
+    public function cancelarRequisicao()
+    {
+        $this->curlType = 1;
+        $this->curlUrl = 'https://pos-api.ifood.com.br/v2.0/orders/' . $this->reference . '/statuses/cancellationRequested';
+        $this->curlHeader = array(
+            'Authorization: bearer ' . $this->access_token,
+            'Cache-Control: no-cache',
+            'Content-Type: application/json',
+        );
+        $this->curlPost();
+    }
+
+    /**
+     * PRONTO PARA RETIRADA
+     */
+    public function delivery()
+    {
+        $this->curlType = 1;
+        $this->curlUrl = 'https://pos-api.ifood.com.br/v1.0/orders/' . $this->reference . '/statuses/delivery';
+        $this->curlHeader = array(
+            'Authorization: bearer ' . $this->access_token,
+            'Cache-Control: no-cache',
+            'Content-Type: application/json',
+        );
+        $this->curlPost();
+    }
+
+
+    public function confirmation()
+    {
+        $this->curlReturnTransfer = 0;
+        $this->curlType = 1;
+        $this->curlUrl = 'https://pos-api.ifood.com.br/v1.0/orders/' . $this->correlationid . '/statuses/confirmation';
+        $this->curlHeader = array(
+            'Authorization: bearer ' . $this->access_token,
+            'Cache-Control: no-cache',
+            'Content-Type: application/json',
+        );
+        $this->curlPost();
+        $this->curlReturnTransfer = 1;
+    }
+
+    public function confirmationget($reference)
+    {
+        $this->correlationid = $reference;
+        $this->confirmation();
+    }
+
+    public function integration()
+    {
+        $this->curlReturnTransfer = 0;
+        $this->curlType = 1;
+        $this->curlUrl = 'https://pos-api.ifood.com.br/v1.0/orders/' . $this->correlationid . '/statuses/integration';
+        $this->curlHeader = array(
+            'Authorization: bearer ' . $this->access_token,
+            'Cache-Control: no-cache',
+            'Content-Type: application/json',
+        );
+        $this->curlPost();
+        $this->curlReturnTransfer = 1;
+    }
+
+    public function integrationget($reference)
+    {
+        $this->correlationid = $reference;
+        $this->integration();
+    }
+
+    public function dispatchIfood(Request $request)
+    {
+    
+        $reference = !empty($request->all())?$request->all():array();
+        $reference = explode(',',$reference);
+        $this->dispatch($reference);
+    
+    }
+    public function dispatch($reference)
+    {
+    
+        foreach ($reference as $v) {
+            $this->correlationid = $v;
+            $this->curlReturnTransfer = 0;
+            $this->curlType = 1;
+            $this->curlUrl = 'https://pos-api.ifood.com.br/v1.0/orders/' . $this->correlationid . '/statuses/dispatch';
+            $this->curlHeader = array(
+                'Authorization: bearer ' . $this->access_token,
+                'Cache-Control: no-cache',
+                'Content-Type: application/json',
+            );
+            $this->curlPost();
+            $this->curlReturnTransfer = 1;
+        }
+
     }
 }

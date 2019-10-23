@@ -1,0 +1,5 @@
+cron:
+- description: "daily summary job"
+  url: /api/ifood/polling
+  schedule: every 1 minute from 17:20 to 03:00
+  timezone: "America/Sao_Paulo"

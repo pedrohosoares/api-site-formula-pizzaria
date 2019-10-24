@@ -284,14 +284,15 @@ class IfoodController extends Controller
      */
     protected function cadastraAtualizaMeioPagamento($pagamento)
     {
-        $formaPg = IpiFormasPg::updateOrCreate(
-            [
-                'cod_formas_pg_ifood' => $pagamento['code']
-            ],
-            [
-                'forma_pg' => $pagamento['name']
-            ]
-        );
+        $formaPg = IpiFormasPg::select(['cod_formas_pg'])->where('cod_formas_pg_ifood', $pagamento['code'])->first();
+        if (empty($formaPg)) {
+            $formaPg = IpiFormasPg::create(
+                [
+                    'cod_formas_pg_ifood' => $pagamento['code'],
+                    'forma_pg' => $pagamento['name']
+                ]
+            );
+        }
         return $formaPg->cod_formas_pg;
     }
 
@@ -383,6 +384,7 @@ class IfoodController extends Controller
         if (!empty($this->curlBody) and ($this->curlHttp == 200) or $this->curlHttp == 201) {
             //"[{"id":"bee06149-1c26-4bf1-aef3-6983ea65c590","code":"PLACED","correlationId":"3199106436775033","createdAt":"2019-10-21T15:13:40.841Z"}]"
             $this->polling = json_decode($this->curlBody, true);
+            dump($this->polling);
             $this->proccessaPolling();
         } else {
             if ($this->curlHttp != 404) {
@@ -551,18 +553,30 @@ class IfoodController extends Controller
         }
     }
 
-    public function readyToDelivery()
+    protected function readyToDelivery($reference)
     {
-        $this->curlType = 1;
-        $this->curlUrl = 'https://pos-api.ifood.com.br/v2.0/orders/' . $this->reference . '/statuses/readyToDeliver';
-        $this->curlHeader = array(
-            'Authorization: bearer ' . $this->access_token,
-            'Cache-Control: no-cache',
-            'Content-Type: application/json',
-        );
-        $this->curlPost();
+        foreach ($reference as $v) {
+            $this->curlType = 1;
+            $this->curlUrl = 'https://pos-api.ifood.com.br/v2.0/orders/' . $v . '/statuses/readyToDeliver';
+            $this->curlHeader = array(
+                'Authorization: bearer ' . $this->access_token,
+                'Cache-Control: no-cache',
+                'Content-Type: application/json',
+            );
+            $this->curlPost();
+        }
     }
 
+
+    public function readyToDeliveryGet(Request $request)
+    {
+        $reference = !empty($request->all()) ? $request->all() : array();
+        $reference['reference'] = isset($reference['reference']) ? $reference['reference'] : array();
+        $reference = explode(',', $reference['reference']);
+        if (!empty($reference)) {
+            $this->readyToDelivery($reference);
+        }
+    }
 
     /**
      * CANCELLATION REQUESTED
@@ -637,15 +651,18 @@ class IfoodController extends Controller
 
     public function dispatchIfood(Request $request)
     {
-    
-        $reference = !empty($request->all())?$request->all():array();
-        $reference = explode(',',$reference);
-        $this->dispatch($reference);
-    
+
+        $reference = !empty($request->all()) ? $request->all() : array();
+        $reference['reference'] = isset($reference['reference']) ? $reference['reference'] : array();
+        $reference = explode(',', $reference['reference']);
+        if (!empty($reference)) {
+            $this->dispatch($reference);
+        }
     }
-    public function dispatch($reference)
+
+    protected function dispatch($reference)
     {
-    
+
         foreach ($reference as $v) {
             $this->correlationid = $v;
             $this->curlReturnTransfer = 0;
@@ -659,6 +676,5 @@ class IfoodController extends Controller
             $this->curlPost();
             $this->curlReturnTransfer = 1;
         }
-
     }
 }

@@ -45,6 +45,7 @@ Route::prefix('tickets')->group(function () {
     Route::get('/tickets', 'TicketsController@recuperaTicket');
     Route::post('/criar_tickets', 'TicketsController@insereTicket');
     Route::match(['put'], '/alterar_categoria/{cod_categorias}', 'TicketsController@alteraCategoria');
+
 });
 
 
@@ -84,6 +85,7 @@ Route::prefix('ifood')->group(function () {
     Route::get('/confirmation/{reference}', 'IfoodController@confirmationget');
     Route::get('/integration/{reference}', 'IfoodController@integrationget');
     Route::get('/dispatch/','IfoodController@dispatchIfood');
+    Route::get('/ready-to-delivery','IfoodController@readyToDeliveryGet');
 
 });
 

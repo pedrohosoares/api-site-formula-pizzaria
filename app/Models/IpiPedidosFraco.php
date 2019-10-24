@@ -77,4 +77,8 @@ class IpiPedidosFraco extends Eloquent
 	{
 		return $this->hasMany(\App\Models\IpiPedidosIngrediente::class, 'cod_pedidos_fracoes');
 	}
+
+	public function getPedidoFracoes($cod_pedidos){
+		return $this->where('cod_pedidos',$cod_pedidos);
+	}
 }

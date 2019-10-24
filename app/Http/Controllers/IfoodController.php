@@ -64,7 +64,7 @@ class IfoodController extends Controller
     public $curlReturnTransfer = 1;
     public $curlPut = false;
 
-    public function __construct(Request $request)
+    public function __construct()
     {
         $this->leAccessToken();
     }
@@ -384,7 +384,6 @@ class IfoodController extends Controller
         if (!empty($this->curlBody) and ($this->curlHttp == 200) or $this->curlHttp == 201) {
             //"[{"id":"bee06149-1c26-4bf1-aef3-6983ea65c590","code":"PLACED","correlationId":"3199106436775033","createdAt":"2019-10-21T15:13:40.841Z"}]"
             $this->polling = json_decode($this->curlBody, true);
-            dump($this->polling);
             $this->proccessaPolling();
         } else {
             if ($this->curlHttp != 404) {

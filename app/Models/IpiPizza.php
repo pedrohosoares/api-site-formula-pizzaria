@@ -122,4 +122,7 @@ class IpiPizza extends Eloquent
 		return $this->belongsToMany(\App\Models\IpiTamanho::class, 'ipi_pizzas_ipi_tamanhos', 'cod_pizzas', 'cod_tamanhos')
 					->withPivot('preco', 'valor_imposto', 'pontos_fidelidade', 'cod_pizzarias', 'cod_impressoras', 'pizza_semana', 'pizza_dia');
 	}
+	public function getSaborFracaoPizza($cod_pizzas){
+		return $this->where('cod_pizzas',$cod_pizzas);
+	}
 }

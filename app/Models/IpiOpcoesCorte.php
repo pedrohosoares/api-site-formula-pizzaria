@@ -34,4 +34,8 @@ class IpiOpcoesCorte extends Eloquent
 		return $this->belongsToMany(\App\Models\IpiTamanho::class, 'ipi_tamanhos_ipi_opcoes_corte', 'cod_opcoes_corte', 'cod_tamanhos')
 					->withPivot('preco', 'tamanho_padrao', 'selecao_padrao_corte');
 	}
+
+	public function getOpcoesCorte($cod_opcoes_corte){
+		return $this->where('cod_opcoes_corte',$cod_opcoes_corte);
+	}
 }

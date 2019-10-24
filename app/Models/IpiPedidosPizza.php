@@ -7,6 +7,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use Reliese\Database\Eloquent\Model as Eloquent;
 
 /**
@@ -131,5 +132,8 @@ class IpiPedidosPizza extends Eloquent
 	}
 	public function ipi_opcoes_corte(){
 		return $this->hasOne(\App\Models\IpiOpcoesCorte::class,'cod_opcoes_corte','cod_opcoes_corte');
+	}
+	public function getPedidosPizzas($cod_pedidos){
+		return $this->where('cod_pedidos',$cod_pedidos);
 	}
 }

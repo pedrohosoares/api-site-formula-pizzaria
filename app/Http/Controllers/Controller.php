@@ -228,14 +228,6 @@ class Controller extends BaseController
             ->get();
     }
 
-    public function ingredientesNaoInclusos($cod_pedidos,$cod_pedidos_pizzas,$cod_pedidos_fracoes,$cod_pizzas){
-        return DB::select("SELECT i.ingrediente FROM ipi_ingredientes i INNER JOIN ipi_ingredientes_ipi_pizzas p ON (i.cod_ingredientes = p.cod_ingredientes) WHERE p.cod_ingredientes NOT IN (SELECT pi.cod_ingredientes FROM ipi_pedidos_ingredientes pi INNER JOIN ipi_pedidos_fracoes pf ON (pi.cod_pedidos_fracoes = pf.cod_pedidos_fracoes AND pi.cod_pedidos_pizzas = pf.cod_pedidos_pizzas AND pi.cod_pedidos = pf.cod_pedidos) INNER JOIN ipi_pedidos_pizzas pp ON(pf.cod_pedidos = pp.cod_pedidos AND pf.cod_pedidos_pizzas = pp.cod_pedidos_pizzas) WHERE pi.cod_pedidos = '" . $cod_pedidos . "' AND pi.cod_pedidos_pizzas = '" . $cod_pedidos_pizzas . "' AND pi.cod_pedidos_fracoes = '" . $cod_pedidos_fracoes . "' AND pi.ingrediente_padrao = 1) AND p.cod_pizzas = '" . $cod_pizzas . "' AND i.consumo = 0");
-    }
-
-    public function ingredientesInclusos($cod_pedidos,$cod_pedidos_pizzas,$cod_pedidos_fracoes,$cod_pizzas){
-        return DB::select("SELECT pzi.ingrediente,(select ingrediente from ipi_ingredientes where cod_ingredientes = pi.cod_ingrediente_trocado) as nome_trocado FROM ipi_pedidos_ingredientes pi INNER JOIN ipi_pedidos_fracoes pf ON (pi.cod_pedidos_fracoes = pf.cod_pedidos_fracoes AND pi.cod_pedidos_pizzas = pf.cod_pedidos_pizzas AND pi.cod_pedidos = pf.cod_pedidos) INNER JOIN ipi_ingredientes pzi ON (pi.cod_ingredientes = pzi.cod_ingredientes) INNER JOIN ipi_pedidos_pizzas pp ON(pf.cod_pedidos = pp.cod_pedidos AND pf.cod_pedidos_pizzas = pp.cod_pedidos_pizzas) WHERE pi.cod_pedidos = '" . $cod_pedidos . "' AND pi.cod_pedidos_pizzas = '" . $cod_pedidos_pizzas . "' AND pi.cod_pedidos_fracoes = '" . $cod_pedidos_fracoes . "' AND pi.ingrediente_padrao = 0");
-    }
-
     public function Utf8_ansi($valor = '')
 	{
 		$Utf8_ansi2 = array(

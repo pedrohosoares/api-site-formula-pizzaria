@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\IfoodController;
 use Illuminate\Foundation\Inspiring;
 
 /*
@@ -16,3 +17,10 @@ use Illuminate\Foundation\Inspiring;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->describe('Display an inspiring quote');
+
+
+Artisan::command('polling', function () {
+    $ifood = new IfoodController();
+    $this->call($ifood->polling());
+});
+

@@ -1,7 +1,7 @@
 {
     "name": "laravel/laravel",
     "type": "project",
-    "description": "The Laravel Framework.",
+    "description": "Formula API.",
     "keywords": [
         "framework",
         "laravel"
@@ -10,7 +10,6 @@
     "require": {
         "php": "^7.1.3",
         "ext-gd": "*",
-        "wkhtmltopdf":"",
         "barryvdh/laravel-dompdf": "^0.8.5",
         "fideloper/proxy": "^4.0",
         "laravel/framework": "5.8.*",

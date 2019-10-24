@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
 use App\Models\IpiPedido;
 use App\Models\IpiPedidosAdicionai;
@@ -42,108 +43,109 @@ use App\Models\IpiTamanhosIpiTipoMassa;
 use App\Models\IpiIngredientesIpiTamanho;
 use App\Models\IpiIngrediente;
 use App\Models\IpiAdicionai;
-
+use App\Models\IpiOpcoesCorte;
+use App\Models\IpiTipoMassa;
 
 class CuponsController extends Controller
 {
-    
+
     public function cupom_cozinha_ifood($cod_pedido)
-    { 
+    {
         $pedidos = IpiPedido::find($cod_pedido);
         $json = $pedidos->pedido_ifood_json;
         if (empty($json)) {
-			exit;
-		}
-		$json = str_replace(array("\r", "\n"), '', $json);
-		$json = json_decode($json, true);
-		$order = $json['order'];
-		$merchant = $order['merchant'];
-		$payments = $order['payments'];
-		$customer = $order['customer'];
-		$items = $order['items'];
-		$subtotal = $order['subTotal'];
-		$totalPrice = $order['totalPrice'];
-		$deliveryFee = $order['deliveryFee'];
-		$deliveryAddress = $order['deliveryAddress'];
-		$html = "<!DOCTYPE html>";
-		$html .= "<html>";
-		$html .= "<head>";
-		$html .= '<meta charset="utf-8" />';
-		$html .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-		$html .= '<title>Pedido - Fórmula Pizzaria</title>';
-		$html .= '<style>';
-		$html .= 'body{min-height:auto;}';
-		$html .= 'body table{max-width: 320px; margin: auto; font-family: sans-serif;}';
-		$html .= '@media print {body{width:100%;margin:1px;}table{/*width:143.9999% !important;*/width:100% !important;margin:1px;}}@page{margin:1px;}';
-		$html .= '</style>';
-		$html .= "</head>";
-		$html .= "<body>";
-		$html .= "<table align='center' style='font-family:sans-serif;'>";
-		$html .= "<tr>";
-		$html .= "<td align='left' colspan='2'><strong>COD PEDIDO <span style='font-size:40px;'><br />" . $pedidos->cod_pedidos . "</span></strong></td>";
-		$html .= "</tr>";
-		$html .= "<tr>";
-		$html .= "<td align='left' colspan='2'>ORIGEM IFOOD</td>";
-		$html .= "</tr>";
-		$html .= "<tr>";
-		$html .= "<td colspan='2'>HORÁRIO: " . date('d/m/Y H:i:s', strtotime($order['createdAt'])) . "</td>";
-		$html .= "</tr>";
-		if ($pedidos->cod_pizzarias == 23) {
-			$html .= "<tr>";
-			$html .= "<td colspan='2'>CLIENTE: " . $customer['name'] . "</td>";
-			$html .= "</tr>";
-			$html .= "<tr>";
-			$html .= "<td colspan='2'>ID IFOOD: " . $order['shortReference'] . "</td>";
-			$html .= "</tr>";
-		}
-		$conta = 1;
-		foreach ($items as $ki => $vi) {
-			if ($this->contemString($this->Utf8_ansi($vi['name'])) == false) {
-				for ($i = 0; $i < $vi['quantity']; $i++) {
-					# code...
-					$html .= "<tr>";
-					$html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
-					$html .= "</tr>";
-					$html .= "<tr>";
-					$html .= "<td align='center' colspan='2'><strong>" . $conta . " - Pedido</strong></td>";
-					$html .= "</tr>";
-					$html .= "<tr>";
-					$html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
-					$html .= "</tr>";
-					$html .= "<tr>";
-					$html .= "<td>" . $this->Utf8_ansi($vi['name']) . "</td>";
-					$html .= "<td></td>";
-					$html .= "</tr>";
-					if (isset($vi['subItems'])) {
-						foreach ($vi['subItems'] as $ksi => $vsi) {
-							if ($this->contemString($this->Utf8_ansi($vsi['name'])) == false) {
-								$html .= "<tr>";
-								$html .= "<td> -- " . $this->Utf8_ansi($vsi['name']) . "</td>";
-								$html .= "<td style=' width: 75px; text-align: right; '> QTD " . $vsi['quantity'] . "</td>";
-								$html .= "</tr>";
-								if (isset($vsi["observations"])) {
-									$html .= "<tr>";
-									$html .= "<td>OBSERVAÇÕES: </td>";
-									$html .= "<td>" . $this->Utf8_ansi($vsi["observations"]) . "</td>";
-									$html .= "</tr>";
-								}
-							}
-						}
-					}
-					if (isset($vi["observations"])) {
-						$html .= "<tr>";
-						$html .= "<td>OBSERVAÇÕES: </td>";
-						$html .= "<td>" . $this->Utf8_ansi($vi["observations"]) . "</td>";
-						$html .= "</tr>";
-					}
-					$conta++;
-				}
-			}
-		}
-		$html .= "</table>";
-		$html .= "</body>";
-		$html .= "</html>";
-		return $html;
+            exit;
+        }
+        $json = str_replace(array("\r", "\n"), '', $json);
+        $json = json_decode($json, true);
+        $order = $json['order'];
+        $merchant = $order['merchant'];
+        $payments = $order['payments'];
+        $customer = $order['customer'];
+        $items = $order['items'];
+        $subtotal = $order['subTotal'];
+        $totalPrice = $order['totalPrice'];
+        $deliveryFee = $order['deliveryFee'];
+        $deliveryAddress = $order['deliveryAddress'];
+        $html = "<!DOCTYPE html>";
+        $html .= "<html>";
+        $html .= "<head>";
+        $html .= '<meta charset="utf-8" />';
+        $html .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+        $html .= '<title>Pedido - Fórmula Pizzaria</title>';
+        $html .= '<style>';
+        $html .= 'body{min-height:auto;}';
+        $html .= 'body table{max-width: 320px; margin: auto; font-family: sans-serif;}';
+        $html .= '@media print {body{width:100%;margin:1px;}table{/*width:143.9999% !important;*/width:100% !important;margin:1px;}}@page{margin:1px;}';
+        $html .= '</style>';
+        $html .= "</head>";
+        $html .= "<body>";
+        $html .= "<table align='center' style='font-family:sans-serif;'>";
+        $html .= "<tr>";
+        $html .= "<td align='left' colspan='2'><strong>COD PEDIDO <span style='font-size:40px;'><br />" . $pedidos->cod_pedidos . "</span></strong></td>";
+        $html .= "</tr>";
+        $html .= "<tr>";
+        $html .= "<td align='left' colspan='2'>ORIGEM IFOOD</td>";
+        $html .= "</tr>";
+        $html .= "<tr>";
+        $html .= "<td colspan='2'>HORÁRIO: " . date('d/m/Y H:i:s', strtotime($order['createdAt'])) . "</td>";
+        $html .= "</tr>";
+        if ($pedidos->cod_pizzarias == 23) {
+            $html .= "<tr>";
+            $html .= "<td colspan='2'>CLIENTE: " . $customer['name'] . "</td>";
+            $html .= "</tr>";
+            $html .= "<tr>";
+            $html .= "<td colspan='2'>ID IFOOD: " . $order['shortReference'] . "</td>";
+            $html .= "</tr>";
+        }
+        $conta = 1;
+        foreach ($items as $ki => $vi) {
+            if ($this->contemString($this->Utf8_ansi($vi['name'])) == false) {
+                for ($i = 0; $i < $vi['quantity']; $i++) {
+                    # code...
+                    $html .= "<tr>";
+                    $html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
+                    $html .= "</tr>";
+                    $html .= "<tr>";
+                    $html .= "<td align='center' colspan='2'><strong>" . $conta . " - Pedido</strong></td>";
+                    $html .= "</tr>";
+                    $html .= "<tr>";
+                    $html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
+                    $html .= "</tr>";
+                    $html .= "<tr>";
+                    $html .= "<td>" . $this->Utf8_ansi($vi['name']) . "</td>";
+                    $html .= "<td></td>";
+                    $html .= "</tr>";
+                    if (isset($vi['subItems'])) {
+                        foreach ($vi['subItems'] as $ksi => $vsi) {
+                            if ($this->contemString($this->Utf8_ansi($vsi['name'])) == false) {
+                                $html .= "<tr>";
+                                $html .= "<td> -- " . $this->Utf8_ansi($vsi['name']) . "</td>";
+                                $html .= "<td style=' width: 75px; text-align: right; '> QTD " . $vsi['quantity'] . "</td>";
+                                $html .= "</tr>";
+                                if (isset($vsi["observations"])) {
+                                    $html .= "<tr>";
+                                    $html .= "<td>OBSERVAÇÕES: </td>";
+                                    $html .= "<td>" . $this->Utf8_ansi($vsi["observations"]) . "</td>";
+                                    $html .= "</tr>";
+                                }
+                            }
+                        }
+                    }
+                    if (isset($vi["observations"])) {
+                        $html .= "<tr>";
+                        $html .= "<td>OBSERVAÇÕES: </td>";
+                        $html .= "<td>" . $this->Utf8_ansi($vi["observations"]) . "</td>";
+                        $html .= "</tr>";
+                    }
+                    $conta++;
+                }
+            }
+        }
+        $html .= "</table>";
+        $html .= "</body>";
+        $html .= "</html>";
+        return $html;
     }
 
     public function cupom_pedido_ifood($cod_pedido)
@@ -379,15 +381,15 @@ class CuponsController extends Controller
         $html .= "</tr>";
         $html .= "<tr>";
         $html .= "<td>COD PEDIDO: </td>";
-		$html .= "<td>" . $pedidos->cod_pedidos . "</td>";
-		$html .= "</tr>";
-		$html .= "<td>PREÇO ENTREGA: </td>";
-		$html .= "<td>R$" . number_format($taxa_entrega, 2) . "</td>";
-		$html .= "</tr>";
-		$html .= "</table>";
-		$html .= "</body>";
-		$html .= "</html>";
-		return $html;
+        $html .= "<td>" . $pedidos->cod_pedidos . "</td>";
+        $html .= "</tr>";
+        $html .= "<td>PREÇO ENTREGA: </td>";
+        $html .= "<td>R$" . number_format($taxa_entrega, 2) . "</td>";
+        $html .= "</tr>";
+        $html .= "</table>";
+        $html .= "</body>";
+        $html .= "</html>";
+        return $html;
     }
 
     public function cupom_cozinha_tel($cod_pedido)
@@ -437,37 +439,50 @@ class CuponsController extends Controller
             $html .= "<td>" . $pedidos->obs_pedido . "</td>";
             $html .= "</tr>";
         }
-        foreach ($pedidos->ipi_pedidos_pizzas as $i => $v) {
+        $pedidosPizza = new IpiPedidosPizza();
+        $pedidosPizza = $pedidosPizza->getPedidosPizzas($pedidos->cod_pedidos)->get();
+        foreach ($pedidosPizza as $i => $v) {
             $numeropizza = $i + 1;
+            $tamanhos = new IpiTamanho();
+            $tamanhos = $tamanhos->getTamanho($v->cod_tamanhos)->first();
             $html .= '<tr>';
             $html .= '<td style="border-top:2px dotted #000;border-bottom:2px dotted #000;" colspan="2" align="center"><strong>' . $numeropizza . ' - Pedido</strong></td>';
             $html .= '</tr>';
             $html .= '<tr>';
             $html .= '<td><strong>TAMANHO</strong>: </td>';
-            $html .= '<td>' . $v->ipi_tamanho->tamanho . '</td>';
+            $html .= '<td>' . $tamanhos->tamanho . '</td>';
             $html .= '</tr>';
             $html .= '<tr>';
             $html .= '<td>MASSA: </td>';
-            $html .= '<td>' . $v->ipi_tipo_massa->tipo_massa . '</td>';
+            $tipo_massa = new IpiTipoMassa();
+            $tipo_massa = $tipo_massa->getTipoMassa($v->cod_tipo_massa)->first();
+            $html .= '<td>' . $tipo_massa->tipo_massa . '</td>';
             $html .= '</tr>';
             $html .= '<tr>';
             $html .= '<td>CORTE: </td>';
-            $html .= '<td>' . $v->ipi_opcoes_corte->opcao_corte . '</td>';
+            $opcoes_corte = new IpiOpcoesCorte();
+            $opcoes_corte = $opcoes_corte->getOpcoesCorte($v->cod_opcoes_corte)->first();
+            $html .= '<td>' . $opcoes_corte->opcao_corte . '</td>';
             $html .= '</tr>';
-            foreach ($v->ipi_pedidos_bordas as $iborda => $vborda) {
+            $pedidosBordas = new IpiPedidosBorda();
+            $pedidosBordas = $pedidosBordas->getPedidoBordaPizza($v->cod_pedidos_pizzas)->first();
+            if (!empty($pedidosBordas)) {
                 $html .= '<tr>';
                 $html .= '<td>BORDA: </td>';
-                $html .= '<td>' . $vborda->borda . '</td>';
+                $html .= '<td>' . $pedidosBordas->borda . '</td>';
                 $html .= '</tr>';
             }
-            $fracoes = $v->ipi_pedidos_fracos;
-            $totalFracao = count($fracoes);
-            foreach ($fracoes as $fi => $fracao) {
+            $pedidosFracoes = new IpiPedidosFraco();
+            $pedidosFracoes = $pedidosFracoes->getPedidoFracoes($v->cod_pedidos)->get();
+            $totalFracao = count($pedidosFracoes);
+            foreach ($pedidosFracoes as $fi => $fracao) {
                 $numeroFracao = $fi + 1;
                 $html .= '<tr>';
                 $html .= '<td>PIZZA: ' . $numeroFracao . ' / ' . $totalFracao . '</td>';
-                $promocional = $fracao->ipi_pedidos_pizza_unico->promocional == 1 ? " (Grátis) " : "";
-                $html .= '<td>SABOR: ' . $fracao->ipi_pizza->pizza . ' '  . $promocional . '</td>';
+                $promocional = $v->promocional == 1 ? " (Grátis) " : "";
+                $saborPizza = new IpiPizza();
+                $saborPizza = $saborPizza->getSaborFracaoPizza($fracao->cod_pizzas)->first();
+                $html .= '<td>SABOR: ' . $saborPizza->pizza . ' '  . $promocional . '</td>';
                 $html .= '</tr>';
                 if (!empty($fracao->obs_fracao)) {
                     $html .= '<tr>';
@@ -481,7 +496,7 @@ class CuponsController extends Controller
                     $html .= '<td>' . $fracao->ifood . '</td>';
                     $html .= '</tr>';
                 }
-                $ingredientesNaoRemovidos = Controller::ingredientesNaoInclusos(
+                $ingredientesNaoRemovidos = IpiIngrediente::ingredientesNaoInclusos(
                     $cod_pedido,
                     $fracao->ipi_pedidos_pizza_unico->cod_pedidos_pizzas,
                     $fracao->cod_pedidos_fracoes,
@@ -497,7 +512,7 @@ class CuponsController extends Controller
                     }
                     $html .= '</td></tr>';
                 }
-                $ingredientesRemovidos = Controller::ingredientesInclusos(
+                $ingredientesRemovidos = IpiIngrediente::ingredientesInclusos(
                     $cod_pedido,
                     $fracao->ipi_pedidos_pizza_unico->cod_pedidos_pizzas,
                     $fracao->cod_pedidos_fracoes,
@@ -563,37 +578,51 @@ class CuponsController extends Controller
             $html .= "<td>" . $pedidos->obs_pedido . "</td>";
             $html .= "</tr>";
         }
-        foreach ($pedidos->ipi_pedidos_pizzas as $i => $v) {
+        
+        $pedidosPizza = new IpiPedidosPizza();
+        $pedidosPizza = $pedidosPizza->getPedidosPizzas($pedidos->cod_pedidos)->get();
+        foreach ($pedidosPizza as $i => $v) {
             $numeropizza = $i + 1;
+            $tamanhos = new IpiTamanho();
+            $tamanhos = $tamanhos->getTamanho($v->cod_tamanhos)->first();
             $html .= '<tr>';
-            $html .= '<td style="border-top:2px dotted #000;border-bottom:2px dotted #000;" colspan="2" align="center"><strong>' . $numeropizza . ' - PEDIDO</strong></td>';
+            $html .= '<td style="border-top:2px dotted #000;border-bottom:2px dotted #000;" colspan="2" align="center"><strong>' . $numeropizza . ' - Pedido</strong></td>';
             $html .= '</tr>';
             $html .= '<tr>';
             $html .= '<td><strong>TAMANHO</strong>: </td>';
-            $html .= '<td>' . $v->ipi_tamanho->tamanho . '</td>';
+            $html .= '<td>' . $tamanhos->tamanho . '</td>';
             $html .= '</tr>';
             $html .= '<tr>';
             $html .= '<td>MASSA: </td>';
-            $html .= '<td>' . $v->ipi_tipo_massa->tipo_massa . '</td>';
+            $tipo_massa = new IpiTipoMassa();
+            $tipo_massa = $tipo_massa->getTipoMassa($v->cod_tipo_massa)->first();
+            $html .= '<td>' . $tipo_massa->tipo_massa . '</td>';
             $html .= '</tr>';
             $html .= '<tr>';
             $html .= '<td>CORTE: </td>';
-            $html .= '<td>' . $v->ipi_opcoes_corte->opcao_corte . '</td>';
+            $opcoes_corte = new IpiOpcoesCorte();
+            $opcoes_corte = $opcoes_corte->getOpcoesCorte($v->cod_opcoes_corte)->first();
+            $html .= '<td>' . $opcoes_corte->opcao_corte . '</td>';
             $html .= '</tr>';
-            foreach ($v->ipi_pedidos_bordas as $iborda => $vborda) {
+            $pedidosBordas = new IpiPedidosBorda();
+            $pedidosBordas = $pedidosBordas->getPedidoBordaPizza($v->cod_pedidos_pizzas)->first();
+            if (!empty($pedidosBordas)) {
                 $html .= '<tr>';
                 $html .= '<td>BORDA: </td>';
-                $html .= '<td>' . $vborda->borda . '</td>';
+                $html .= '<td>' . $pedidosBordas->borda . '</td>';
                 $html .= '</tr>';
             }
-            $fracoes = $v->ipi_pedidos_fracos;
-            $totalFracao = count($fracoes);
-            foreach ($fracoes as $fi => $fracao) {
+            $pedidosFracoes = new IpiPedidosFraco();
+            $pedidosFracoes = $pedidosFracoes->getPedidoFracoes($v->cod_pedidos)->get();
+            $totalFracao = count($pedidosFracoes);
+            foreach ($pedidosFracoes as $fi => $fracao) {
                 $numeroFracao = $fi + 1;
                 $html .= '<tr>';
                 $html .= '<td>PIZZA: ' . $numeroFracao . ' / ' . $totalFracao . '</td>';
-                $promocional = $fracao->ipi_pedidos_pizza_unico->promocional == 1 ? " (Grátis) " : "";
-                $html .= '<td>SABOR: ' . $fracao->ipi_pizza->pizza . ' '  . $promocional . '</td>';
+                $promocional = $v->promocional == 1 ? " (Grátis) " : "";
+                $saborPizza = new IpiPizza();
+                $saborPizza = $saborPizza->getSaborFracaoPizza($fracao->cod_pizzas)->first();
+                $html .= '<td>SABOR: ' . $saborPizza->pizza . ' '  . $promocional . '</td>';
                 $html .= '</tr>';
                 if (!empty($fracao->obs_fracao)) {
                     $html .= '<tr>';
@@ -607,7 +636,7 @@ class CuponsController extends Controller
                     $html .= '<td>' . $fracao->ifood . '</td>';
                     $html .= '</tr>';
                 }
-                $ingredientesNaoRemovidos = Controller::ingredientesNaoInclusos(
+                $ingredientesNaoRemovidos = IpiIngrediente::ingredientesNaoInclusos(
                     $cod_pedido,
                     $fracao->ipi_pedidos_pizza_unico->cod_pedidos_pizzas,
                     $fracao->cod_pedidos_fracoes,
@@ -615,7 +644,7 @@ class CuponsController extends Controller
                 );
                 if (!empty($ingredientesNaoRemovidos)) {
                     $html .= '<tr>';
-                    $html .= '<td colspan="2"><strong> INGREDIENTES REMOVIDOS</strong></td>';
+                    $html .= '<td colspan="2"><strong> INGREDIENTES INCLUÍDOS</strong></td>';
                     $html .= '</tr>';
                     $html .= '<tr><td>';
                     foreach ($ingredientesNaoRemovidos as $keyii => $valueii) {
@@ -623,7 +652,7 @@ class CuponsController extends Controller
                     }
                     $html .= '</td></tr>';
                 }
-                $ingredientesRemovidos = Controller::ingredientesInclusos(
+                $ingredientesRemovidos = IpiIngrediente::ingredientesInclusos(
                     $cod_pedido,
                     $fracao->ipi_pedidos_pizza_unico->cod_pedidos_pizzas,
                     $fracao->cod_pedidos_fracoes,
@@ -631,7 +660,7 @@ class CuponsController extends Controller
                 );
                 if (!empty($ingredientesRemovidos)) {
                     $html .= '<tr>';
-                    $html .= '<td colspan="2"><strong> INGREDIENTES INCLUÍDOS</strong></td>';
+                    $html .= '<td colspan="2"><strong> INGREDIENTES REMOVIDOS</strong></td>';
                     $html .= '</tr>';
                     $html .= '<tr><td colspan="2">';
                     foreach ($ingredientesRemovidos as $keyr => $valuer) {
@@ -641,7 +670,9 @@ class CuponsController extends Controller
                 }
             }
         }
-        $bebidas = $pedidos->ipi_pedidos_bebidas;
+
+        $bebidas = new IpiPedidosBebida();
+        $bebidas = $bebidas->getPedidosBebidas($v->cod_pedidos)->get();
         if (isset($bebidas[0])) {
             $html .= '<tr>';
             $html .= '<td colspan="2" style="border-top:2px dotted #000;"></td>';
@@ -849,7 +880,7 @@ class CuponsController extends Controller
                 $html .= '<tr>';
                 $troco = $troco - $pedidos->valor_total;
                 $html .= '<td><strong>TROCO:</strong> </td>';
-                $html .= '<td>R$' . number_format($troco,2) . '</td>';
+                $html .= '<td>R$' . number_format($troco, 2) . '</td>';
                 $html .= '</tr>';
             }
         }
@@ -884,114 +915,114 @@ class CuponsController extends Controller
     }
 
     public function cupom_cancelado($cod_pedido)
-    { 
+    {
         $pedidos = IpiPedido::find($cod_pedido);
-		$json = $pedidos->pedido_ifood_json;
-		$cancelamento_json = $pedidos->cancelamento_json;
+        $json = $pedidos->pedido_ifood_json;
+        $cancelamento_json = $pedidos->cancelamento_json;
         $dataHora = $pedidos->data_hora_cancelamento;
-		$dataPedido = date('d/m/Y H:i:s', strtotime($pedidos->data_hora_inicial));
+        $dataPedido = date('d/m/Y H:i:s', strtotime($pedidos->data_hora_inicial));
         $apenasData = date('d/m/Y', strtotime($pedidos->data_hora_inicial));
         $origem = $pedidos->origem_pedido;
-		if (!empty($json)) {
-			$json = str_replace(array("\r", "\n"), '', $json);
-			$json = json_decode($json, true);
-		}
-		$html = "<!DOCTYPE html>";
-		$html .= "<html>";
-		$html .= "<head>";
-		$html .= '<meta charset="utf-8" />';
-		$html .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-		$html .= '<title>Pedido - Fórmula Pizzaria</title>';
-		$html .= '<style>';
-		$html .= 'body{min-height:auto;}';
-		$html .= 'body table{max-width: 375px; margin: auto; font-family: sans-serif;}';
-		$html .= '@media print {body{width:100%;margin:1px;}table{/*width:143.9999% !important;*/width:100% !important;margin:1px;}}@page{margin:1px;}';
-		$html .= '</style>';
-		$html .= "</head>";
-		$html .= "<body>";
-		$html .= "<table align='center' style='font-family:sans-serif;'>";
-		$html .= "<tr>";
-		$html .= "<td align='left' colspan='2'><strong>COD PEDIDO <span style='font-size:40px;'>" . $pedidos->cod_pedidos . "</span></strong></td>";
-		$html .= "</tr>";
-		$html .= "<tr>";
-		$html .= "<td align='left' colspan='2'>PEDIDO CANCELADO</td>";
-		$html .= "</tr>";
-		$html .= "<tr>";
-		$html .= "<td align='left' colspan='2'>ORIGEM " . $origem . "</td>";
-		$html .= "</tr>";
-		$html .= "<tr>";
-		$html .= "<td align='left' colspan='2'>HORÁRIO " . $dataHora . "</td>";
-		$html .= "</tr>";
-		if (!empty($cancelamento_json['justificativa']) and isset($cancelamento_json['justificativa'])) {
-			$html .= "<tr>";
-			$html .= "<td align='left' colspan='2'><strong>JUSTIFICATIVA:</strong></td>";
-			$html .= "</tr>";
-			$html .= "<tr>";
-			$html .= "<td align='left' colspan='2'>" . $cancelamento_json['justificativa'] . "</td>";
-			$html .= "</tr>";
-		}
-		$html .= "<tr>";
-		$html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
-		$html .= "</tr>";
-		$html .= "<tr>";
-		$html .= "<td align='center' colspan='2'><strong>PEDIDO CANCELADO</strong></td>";
-		$html .= "</tr>";
-		if (!empty($json)) {
-			foreach ($json['order']['payments'] as $key => $value) {
-				if (isset($value['prepaid'])) {
-					if ($value['prepaid'] == true) {
-						$vetor['prepago'][] = $value;
-					} else {
-						$vetor['pospago'][] = $value;
-					}
-				}
-			}
-			if (!empty($vetor['prepago']) and isset($vetor['prepago'])) {
-				$html .= "<tr>";
-				$html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
-				$html .= "</tr>";
-				$html .= "<tr>";
-				$html .= "<td align='left' colspan='2'><strong>VALORES JÁ PAGOS</strong></td>";
-				$html .= "</tr>";
-			}
-			if (isset($vetor['prepago'])) {
-				foreach ($vetor['prepago'] as $key => $value) {
-					$html .= "<tr>";
-					$html .= "<td align='left' colspan='2'>R$" . number_format($value['value'],2) . "</td>";
-					$html .= "</tr>";
-				}
-			}
-			if (!empty($vetor['pospago']) and isset($vetor['pospago'])) {
-				$html .= "<tr>";
-				$html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
-				$html .= "</tr>";
-				$html .= "<tr>";
-				$html .= "<td align='left' colspan='2'><strong>VALORES NÃO PAGOS</strong></td>";
-				$html .= "</tr>";
-			}
-			if (isset($vetor['pospago'])) {
-				foreach ($vetor['pospago'] as $key => $value) {
-					$html .= "<tr>";
-					$html .= "<td align='left' colspan='2'>R$" . number_format($value['value'],2) . "</td>";
-					$html .= "</tr>";
-				}
-			}
-			$html .= "<tr>";
-			$html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
-			$html .= "</tr>";
-			$html .= "<tr>";
-			$html .= "<td align='left' colspan='2'>TOTAL PEDIDO R$" . number_format($json['order']['totalPrice'],2) . "</td>";
-			$html .= "</tr>";
-		} else {
-			$html .= "<tr>";
-			$html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
-			$html .= "</tr>";
-			$html .= "<tr>";
-			$html .= "<td align='left' colspan='2'>TOTAL PEDIDO R$" . number_format($pedidos->valor_total,2) . "</td>";
-			$html .= "</tr>";
-		}
-		$html .= "</table>";
-		$html .= "</body>";
+        if (!empty($json)) {
+            $json = str_replace(array("\r", "\n"), '', $json);
+            $json = json_decode($json, true);
+        }
+        $html = "<!DOCTYPE html>";
+        $html .= "<html>";
+        $html .= "<head>";
+        $html .= '<meta charset="utf-8" />';
+        $html .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+        $html .= '<title>Pedido - Fórmula Pizzaria</title>';
+        $html .= '<style>';
+        $html .= 'body{min-height:auto;}';
+        $html .= 'body table{max-width: 375px; margin: auto; font-family: sans-serif;}';
+        $html .= '@media print {body{width:100%;margin:1px;}table{/*width:143.9999% !important;*/width:100% !important;margin:1px;}}@page{margin:1px;}';
+        $html .= '</style>';
+        $html .= "</head>";
+        $html .= "<body>";
+        $html .= "<table align='center' style='font-family:sans-serif;'>";
+        $html .= "<tr>";
+        $html .= "<td align='left' colspan='2'><strong>COD PEDIDO <span style='font-size:40px;'>" . $pedidos->cod_pedidos . "</span></strong></td>";
+        $html .= "</tr>";
+        $html .= "<tr>";
+        $html .= "<td align='left' colspan='2'>PEDIDO CANCELADO</td>";
+        $html .= "</tr>";
+        $html .= "<tr>";
+        $html .= "<td align='left' colspan='2'>ORIGEM " . $origem . "</td>";
+        $html .= "</tr>";
+        $html .= "<tr>";
+        $html .= "<td align='left' colspan='2'>HORÁRIO " . $dataHora . "</td>";
+        $html .= "</tr>";
+        if (!empty($cancelamento_json['justificativa']) and isset($cancelamento_json['justificativa'])) {
+            $html .= "<tr>";
+            $html .= "<td align='left' colspan='2'><strong>JUSTIFICATIVA:</strong></td>";
+            $html .= "</tr>";
+            $html .= "<tr>";
+            $html .= "<td align='left' colspan='2'>" . $cancelamento_json['justificativa'] . "</td>";
+            $html .= "</tr>";
+        }
+        $html .= "<tr>";
+        $html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
+        $html .= "</tr>";
+        $html .= "<tr>";
+        $html .= "<td align='center' colspan='2'><strong>PEDIDO CANCELADO</strong></td>";
+        $html .= "</tr>";
+        if (!empty($json)) {
+            foreach ($json['order']['payments'] as $key => $value) {
+                if (isset($value['prepaid'])) {
+                    if ($value['prepaid'] == true) {
+                        $vetor['prepago'][] = $value;
+                    } else {
+                        $vetor['pospago'][] = $value;
+                    }
+                }
+            }
+            if (!empty($vetor['prepago']) and isset($vetor['prepago'])) {
+                $html .= "<tr>";
+                $html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
+                $html .= "</tr>";
+                $html .= "<tr>";
+                $html .= "<td align='left' colspan='2'><strong>VALORES JÁ PAGOS</strong></td>";
+                $html .= "</tr>";
+            }
+            if (isset($vetor['prepago'])) {
+                foreach ($vetor['prepago'] as $key => $value) {
+                    $html .= "<tr>";
+                    $html .= "<td align='left' colspan='2'>R$" . number_format($value['value'], 2) . "</td>";
+                    $html .= "</tr>";
+                }
+            }
+            if (!empty($vetor['pospago']) and isset($vetor['pospago'])) {
+                $html .= "<tr>";
+                $html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
+                $html .= "</tr>";
+                $html .= "<tr>";
+                $html .= "<td align='left' colspan='2'><strong>VALORES NÃO PAGOS</strong></td>";
+                $html .= "</tr>";
+            }
+            if (isset($vetor['pospago'])) {
+                foreach ($vetor['pospago'] as $key => $value) {
+                    $html .= "<tr>";
+                    $html .= "<td align='left' colspan='2'>R$" . number_format($value['value'], 2) . "</td>";
+                    $html .= "</tr>";
+                }
+            }
+            $html .= "<tr>";
+            $html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
+            $html .= "</tr>";
+            $html .= "<tr>";
+            $html .= "<td align='left' colspan='2'>TOTAL PEDIDO R$" . number_format($json['order']['totalPrice'], 2) . "</td>";
+            $html .= "</tr>";
+        } else {
+            $html .= "<tr>";
+            $html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
+            $html .= "</tr>";
+            $html .= "<tr>";
+            $html .= "<td align='left' colspan='2'>TOTAL PEDIDO R$" . number_format($pedidos->valor_total, 2) . "</td>";
+            $html .= "</tr>";
+        }
+        $html .= "</table>";
+        $html .= "</body>";
         $html .= "</html>";
         return $html;
     }

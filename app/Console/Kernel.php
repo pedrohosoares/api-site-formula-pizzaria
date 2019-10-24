@@ -25,11 +25,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call('App\Http\Controllers\IfoodController@polling')
-        ->daily()
-        ->between('17:00','02:00');
-        //$schedule->command('inspire')
-        //->hourly();
+        $schedule->command('polling')
+        ->everyMinute()
+        ->sendOutputTo('log.txt');
+        //->between('17:00','02:00')
+        //->withoutOverlapping();
     }
 
     /**

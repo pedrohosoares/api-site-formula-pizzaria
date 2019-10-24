@@ -74,4 +74,7 @@ class IpiPedidosBorda extends Eloquent
 					->where('ipi_pedidos_pizzas.cod_pedidos_pizzas', '=', 'ipi_pedidos_bordas.cod_pedidos_pizzas')
 					->where('ipi_pedidos_pizzas.cod_pedidos', '=', 'ipi_pedidos_bordas.cod_pedidos');
 	}
+	public function getPedidoBordaPizza($cod_pedidos_pizzas){
+		return $this->where("cod_pedidos_pizzas",$cod_pedidos_pizzas);
+	}
 }

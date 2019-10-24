@@ -97,4 +97,8 @@ class IpiTamanho extends Eloquent
 		return $this->belongsToMany(\App\Models\IpiTipoMassa::class, 'ipi_tamanhos_ipi_tipo_massa', 'cod_tamanhos', 'cod_tipo_massa')
 					->withPivot('preco', 'selecao_padrao_massa');
 	}
+	
+	public function getTamanho($cod_tamanhos){
+		return $this->where('cod_tamanhos',$cod_tamanhos);
+	}
 }

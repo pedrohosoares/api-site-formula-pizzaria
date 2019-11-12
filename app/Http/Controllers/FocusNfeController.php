@@ -26,8 +26,12 @@ class FocusNfeController extends Controller
     public $curlPostData;
     public $curlPut = false;
 
+    public $salgado = array('sanduiche', 'sanduíche', 'sanduiches', 'sanduíches', 'calzone', 'calzones', 'pizza', 'pizzas', 'tamanho', 'tamanhos', 'formula', 'fórmula','brownie', 'brownies', 'bronie', 'bronies', 'browniew', 'browniews', 'pudim', 'pudin', 'pudins', 'pudims', 'mousse', 'american');
+    public $bebida = array('fanta', 'guaraná', '2l', 'ml', 'cerveja', 'budweiser');
 
     public $curlDelete = false;
+
+    public $cod_pedido;
 
     public function __construct()
     {
@@ -36,6 +40,12 @@ class FocusNfeController extends Controller
         } else {
             $this->urlBase = $this->urlHomologacao;
         }
+    }
+
+    protected function verificaNome($nome, $string)
+    {
+        $string = explode(' ', $string);
+        return in_array($nome, $string);
     }
 
     public function curlPost()
@@ -66,11 +76,40 @@ class FocusNfeController extends Controller
 
     public function criar_nota_ifood($cod_pedido)
     {
-        $pedido = IpiPedido::select(['pedido_ifood_json'])
-            ->where('cod_pedidos', $cod_pedido)
-            ->whereNotIn('situacao', ['CANCELADO'])
+        $this->cod_pedido = $cod_pedido;
+        $this->montaNotaIfood();
+    }
+
+    protected function nfce(){
+        $nfce = array (
+            "tipo_documento"=>"1",
+            "cnpj_emitente" => $this->cnpj_emitente,
+            "data_emissao" => $this->data_emissao,
+            "indicador_inscricao_estadual_destinatario" => "9",
+            "modalidade_frete" => $this->modalidade_frete,//0-porconta do emitente 1- conta do destinatario 2 - conta de terceiros 9 - sem frete
+            "local_destino" => "1",//1 – Operação interna; 2 – Operação interestadual; 3 – Operação com exterior
+            "presenca_comprador" => "1",//$this->presenca_comprador,//1 – Operação presencial.4 – Entrega a domicílio.
+            "natureza_operacao" => $this->natureza_operacao,
+            "itens" => $this->itens,
+            "formas_pagamento" => array(
+              array(
+                "forma_pagamento" => $this->metodo_pagamento,
+                "valor_pagamento" => $this->valor_pagamento
+              )
+            ),
+          );
+          return $nfce;
+    }
+    
+    protected function montaNotaIfood()
+    {
+        $pedido = IpiPedido::select(['pedido_ifood_json','cnpj'])->
+            leftJoin('ipi_pizzarias','ipi_pedidos.cod_pizzarias','=','ipi_pedidos.cod_pizzarias')
+            ->where('cod_pedidos', $this->cod_pedido)
             ->first();
-        if (!empty($pedido)) {
+        if (!empty($pedido) and !empty($pedido->cnpj)) {
+            $this->cnpj_emitente = $pedido->cnpj;
+            $this->data_emissao = date('Y-m-d').'T'.date('H:i:s');
             $numero_item = 1;
             $pedido = json_decode($pedido->pedido_ifood_json, true);
             foreach ($pedido['order']['items'] as $v) {
@@ -82,30 +121,67 @@ class FocusNfeController extends Controller
                     foreach ($v['subItems'] as $vv) {
                         $item .= ' ' . $vv['name'];
                         $preco += $vv['price'];
-                        $desconto+= $vv['discount'];
+                        $desconto += $vv['discount'];
                     }
                 }
-                $desconto = number_format($desconto,2);
+                
+                $codePizza = false;
+                $codeBebida = false;
+
+                foreach($this->salgado as $nomeProduto){
+                    if(strpos(strtolower($v['name']),$nomeProduto) !== false){
+                        $codePizza = true;		
+                    }
+                }
+                foreach($this->bebida as $nomeProduto){
+                    if(strpos(strtolower($v['name']),$nomeProduto) !== false){
+                        $codeBebida = true;
+                    }
+                }
+
+                #Pizza/CALZONE/sobremesa		
+                $cfop = "5102";
+                $cest = "1704800";
+                $ncm = "19022000";
+                $icms = "102";
+                if ($codeBebida) {
+                    $cfop = "5405";
+                    $cest = "0302100";
+                    $ncm = "22021000";
+                    $icms = "500";
+                }
+
+                $desconto = number_format($desconto, 2);
                 $itens[] = array(
                     "numero_item" => $numero_item,
-                    "codigo_ncm" => "62044200",
+                    "codigo_ncm" => $ncm,
                     "quantidade_comercial" => $quantidade,
                     "quantidade_tributavel" => $quantidade,
-                    "cfop" => "5102",
+                    "cfop" => $cfop,
                     "valor_unitario_tributavel" => $preco,
                     "valor_unitario_comercial" => $preco,
                     "valor_desconto" => $desconto,
-                    "descricao" => "SALGADO PEDIDO VIA IFOOD",
-                    "codigo_produto" => "251887",
+                    "descricao" => "VENDA DE MERCADORIA",
+                    "codigo_produto" => "020103",
                     "icms_origem" => "0",
-                    "icms_situacao_tributaria" => "102",
+                    "icms_situacao_tributaria" => $icms,
                     "unidade_comercial" => "un",
                     "unidade_tributavel" => "un",
-                    "valor_total_tributos" => number_format($preco*0.18,2)
+                    "valor_total_tributos" => number_format($preco * 0.18, 2),
+                    "valor_bruto"=> number_format($v['price']*$v['quantity'],2)
                 );
                 $numero_item++;
             }
-            dump($v);
+            $this->itens = $itens;
+            if(isset($pedido['order']['customer']['taxPayerIdentificationNumber'])){
+                if(strlen($pedido['order']['customer']['taxPayerIdentificationNumber']) == 11){
+                    $this->cpf_destinatario = $pedido['order']['customer']['taxPayerIdentificationNumber'];
+                }
+                if(strlen($pedido['order']['customer']['taxPayerIdentificationNumber']) == 14){
+                    $this->cnpj_destinatario = $pedido['order']['customer']['taxPayerIdentificationNumber'];
+                }
+            }
+            
         }
     }
 

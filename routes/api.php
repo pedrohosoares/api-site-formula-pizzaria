@@ -45,7 +45,6 @@ Route::prefix('tickets')->group(function () {
     Route::get('/tickets', 'TicketsController@recuperaTicket');
     Route::post('/criar_tickets', 'TicketsController@insereTicket');
     Route::match(['put'], '/alterar_categoria/{cod_categorias}', 'TicketsController@alteraCategoria');
-
 });
 
 
@@ -62,6 +61,7 @@ Route::post('/login-formula', 'LoginController@login_formula')->name('login_form
 //IFOOD
 Route::prefix('ifood')->group(function () {
     //Merchant teste 208040
+    Route::get('/json', 'IfoodController@json');
     Route::get('/ifood-token', 'IfoodController@oAuthToken')->name('ifood-token');
     Route::get('/polling', 'IfoodController@polling')->name('polling');
     Route::get('/view-access-token', 'IfoodController@view_access_token')->name('view_access_token');
@@ -81,17 +81,22 @@ Route::prefix('ifood')->group(function () {
     Route::get('/delivery', 'IfoodController@delivery');
     Route::get('/ready-to-delivery', 'IfoodController@readyToDelivery');
     Route::get('/cancelar', 'IfoodController@cancelarRequisicao');
-    
+
     Route::get('/confirmation/{reference}', 'IfoodController@confirmationget');
     Route::get('/integration/{reference}', 'IfoodController@integrationget');
-    Route::get('/dispatch/','IfoodController@dispatchIfood');
-    Route::get('/ready-to-delivery','IfoodController@readyToDeliveryGet');
-
+    Route::get('/dispatch/{ids}', 'IfoodController@dispatchIfood');
+    Route::get('/ready-to-delivery', 'IfoodController@readyToDeliveryGet');
 });
 
 
-
 Route::prefix('cupons')->group(function () {
+
+    Route::get('/teste', 'CuponsController@teste');
+
+    Route::get('/reimprimir/{cod_pedido}/{url_pedido}/{nome_cupom}', 'CuponsController@reimprimir')->name('reimprimir');
+    Route::get('/excluir-cupons', 'CuponsController@excluirCupons')->name('excluirCupons');
+
+    Route::get('/imprimir/{cod_pedido}/{url_pedido}/{imprime}/{nome_cupom}', 'CuponsController@imprimir')->name('imprimir');
 
     Route::get('/cupom-cozinha-ifood/{cod_pedido}', 'CuponsController@cupom_cozinha_ifood')->name('cupom_cozinha_ifood');
     Route::get('/cupom-pedido-ifood/{cod_pedido}', 'CuponsController@cupom_pedido_ifood')->name('cupom_pedido_ifood');
@@ -108,5 +113,4 @@ Route::prefix('notas')->group(function () {
     Route::get('/criar-nota-ifood/{pedido}', 'FocusNfeController@criar_nota_ifood');
     Route::get('/criar-nota-telefone', 'FocusNfeController@criar_nota_telefone');
     Route::get('/transformar-pdf', 'FocusNfeController@transformaEmPdf');
-    
 });

@@ -210,7 +210,7 @@ class IpiPedido extends Eloquent
 	];
 
 	public function ipi_pizzaria(){
-		return $this->belongsTo(\App\Models\IpiPedido::class, 'cod_pizzarias');
+		return $this->belongsTo(\App\Models\IpiPedido::class, 'cod_pizzarias','cod_pizzarias');
 	}
 
 	public function ipi_cliente()
@@ -258,4 +258,5 @@ class IpiPedido extends Eloquent
 	{
 		return $this->hasMany(\App\Models\IpiPedidosSituaco::class, 'cod_pedidos');
 	}
+
 }

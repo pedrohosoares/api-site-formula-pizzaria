@@ -16,6 +16,13 @@ use App\Models\IpiPedidosFormasPg;
 class IfoodController extends Controller
 {
 
+    public function json()
+    {
+        $json = '{"id":"c6e6d2f7-fdc3-4afd-841d-44adf48c4b70","reference":"7092158640749077","shortReference":"4673","createdAt":"2019-11-09T01:29:49.216Z","scheduled":false,"merchant":{"id":"88c3a6f8-86a2-4c08-8e93-f778df4f0383","shortId":"141403","name":"F\u00f3rmula Pizzaria Divin\u00f3polis","address":{"formattedAddress":"CORONEL JOAO NOTINI","country":"BR","state":"MG","city":"DIVINOPOLIS","neighborhood":"CENTRO","streetName":"CORONEL JOAO NOTINI","streetNumber":"366","postalCode":"35500017"}},"payments":[{"name":"MASTERCARD","code":"MC","value":29.4,"prepaid":true,"transaction":"11071911082206349384","issuer":"MASTERCARD","authorizationCode":"266341"}],"customer":{"id":"155428921","name":"neide avallone","phone":"0800 007 0110 ID: 52764794","ordersCountOnRestaurant":0},"items":[{"id":"db225d1f-2040-49d7-bc38-85d7c671380a","name":"Calzones","quantity":1,"price":23.9,"subItemsPrice":5.5,"totalPrice":29.4,"discount":0,"addition":0,"externalId":"80000936","externalCode":"H","subItems":[{"id":"d889a350-b030-458c-8aa5-3be4a7c9b13b","name":"Frango com Catupiry","quantity":1,"price":0,"totalPrice":0,"discount":0,"addition":0,"externalCode":"P55-6"},{"id":"b4f7b343-e830-4a97-990b-a972413fccd2","name":"Guaran\u00e1","quantity":1,"price":5.5,"totalPrice":5.5,"discount":0,"addition":0},{"id":"f813c0cd-4afd-4ff8-99bb-43890860a4ce","name":"N\u00e3o, obrigado.","quantity":1,"price":0,"totalPrice":0,"discount":0,"addition":0}]}],"subTotal":29.4,"totalPrice":37.4,"deliveryFee":8,"deliveryAddress":{"formattedAddress":"R. Arnaldo Carlos Guimar\u00e3es, 611","country":"BR","state":"MG","city":"Divinopolis","coordinates":{"latitude":-20.169075,"longitude":-44.875205},"neighborhood":"Santa Tereza","streetName":"R. Arnaldo Carlos Guimar\u00e3es","streetNumber":"611","postalCode":"00000000"},"deliveryDateTime":"2019-11-09T02:29:49.216Z","preparationStartDateTime":"2019-11-09T01:29:49.216Z","localizer":{"id":"52764794"},"preparationTimeInSeconds":0,"isTest":false,"benefits":[{"value":8,"sponsorshipValues":{"IFOOD":0,"MERCHANT":8},"target":"DELIVERY_FEE","targetId":"80000936"}],"deliveryMethod":{"id":"DEFAULT","value":8,"minTime":60,"maxTime":70,"mode":"DELIVERY","deliveredBy":"NOT_APPLICABLE"}}';
+        $json = json_decode($json, true);
+        dump($json);
+    }
+
     /**
      * Loja teste
      * https://www.ifood.com.br/delivery/bujari-ac/teste-formula-system-bujari/68bb790f-e24f-4666-ad64-86baf9ca2337
@@ -164,15 +171,23 @@ class IfoodController extends Controller
      */
     public function acknowledgment()
     {
-        $this->curlType = 1;
-        $this->curlDataPass = json_encode($this->acknowledgment, true);
-        $this->curlUrl = 'https://pos-api.ifood.com.br/v1.0/events/acknowledgment/';
-        $this->curlHeader = array(
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_ENCODING, '');
+        curl_setopt($ch, CURLOPT_URL, 'https://pos-api.ifood.com.br/v1.0/events/acknowledgment');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 0);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             'Authorization: bearer ' . $this->access_token,
             'Cache-Control: no-cache',
             'Content-Type: application/json',
-        );
-        $this->curlPost();
+        ));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->acknowledgment, true));
+        $body = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
     }
 
     protected function registraCliente()
@@ -193,7 +208,7 @@ class IfoodController extends Controller
             'situacao' => 'ATIVO'
         );
 
-        $cliente = IpiCliente::updateOrCreate(
+        $cliente = IpiCliente::firstOrCreate(
             ['id_ifood_cliente' => $this->order['customer']['id']],
             $cliente
         );
@@ -215,7 +230,7 @@ class IfoodController extends Controller
             'referencia_cliente' => '',
             'obs_endereco' => $this->order['deliveryAddress']['reference']
         );
-        $endereco = IpiEndereco::updateOrCreate(
+        $endereco = IpiEndereco::firstOrCreate(
             ['cod_clientes' => $cliente->cod_clientes],
             $endereco
         );
@@ -268,15 +283,11 @@ class IfoodController extends Controller
             'pedido_ifood_json' => $dadosBD,
             'pedido_integrado' => '1'
         ];
-        $pedido = IpiPedido::create(
+        $pedido = IpiPedido::updateOrCreate(
+            ['ifood_polling' => $this->order['reference']],
             $pedido
         );
         $this->cod_pedidos = $pedido->cod_pedidos;
-    }
-
-    protected function executaCommando()
-    {
-        //exec('wkhtmltopdf --page-width 80mm --page-height 250mm --margin-left 0mm --margin-right 0mm '.$this->url);
     }
 
     /**
@@ -305,7 +316,11 @@ class IfoodController extends Controller
         $pagamentos = $this->order['payments'];
         foreach ($pagamentos as $i => $v) {
             $formaPagamento = $this->cadastraAtualizaMeioPagamento($v);
-            $forma_pg = IpiPedidosFormasPg::create(
+            $forma_pg = IpiPedidosFormasPg::firstOrCreate(
+                array(
+                    'pagamento_json' => json_encode($v),
+                    'cod_pedidos' => $this->cod_pedidos,
+                ),
                 array(
                     'cod_pedidos' => $this->cod_pedidos,
                     'valor' => $v['value'],
@@ -342,13 +357,13 @@ class IfoodController extends Controller
      */
     public function orders()
     {
-        $this->curlUrl = 'https://pos-api.ifood.com.br/v2.0/orders/' . $this->correlationid . '?access_token=' . $this->access_token;
+        $this->curlUrl = 'https://pos-api.ifood.com.br/v3.0/orders/' . $this->correlationid . '?access_token=' . $this->access_token;
         $this->curlPost();
         $this->order = json_decode($this->curlBody, true);
         $this->merchant_id = $this->order['merchant']['shortId'];
         $this->reference = $this->order['reference'];
         $this->recuperaPizzaria();
-        #$dadosBD = '{"polling":[{"id":"22323f72-842f-455c-979b-5fa6d56acfb5","code":"PLACED","correlationId":"6193176434464066","createdAt":"2019-10-21T15:44:40.409Z"}],"reference":"6193176434464066","order":{"id":"c2976349-3665-4a25-b4ab-453363683b69","reference":"6193176434464066","shortReference":"5728","createdAt":"2019-10-21T15:44:39.902Z","scheduled":false,"type":"DELIVERY","merchant":{"id":"68bb790f-e24f-4666-ad64-86baf9ca2337","shortId":"208040","name":"TESTE Formula System","address":{"formattedAddress":"RAMAL BUJARI","country":"BR","state":"AC","city":"BUJARI","neighborhood":"bujari","streetName":"RAMAL BUJARI","streetNumber":"123","postalCode":"69923000"}},"payments":[{"name":"D\u00c9BITO - MASTERCARD (M\u00c1QUINA)","code":"MEREST","value":89.6,"prepaid":false}],"customer":{"id":"109125238","name":"PEDIDO DE TESTE - Pedro Henrique","taxPayerIdentificationNumber":"11427599629","phone":"0800 007 0110 ID: 20787445","ordersCountOnRestaurant":0},"items":[{"id":"eaa65d78-0720-4d9f-ad25-83c23a24efe7","name":"PEDIDO DE TESTE - Pizza novo cadastro de adicional","quantity":1,"price":0,"subItemsPrice":69.6,"totalPrice":69.6,"discount":0,"addition":0,"externalCode":"H","subItems":[{"id":"e5fe43a7-12f7-40d8-9e50-9e5d4bc962cb","name":"Borda Catupiry","quantity":1,"price":6,"totalPrice":6,"discount":0,"addition":0,"externalCode":"R1"},{"id":"3cd9379b-a491-464d-a499-2aa8e42ff917","name":"Bacon","quantity":1,"price":4,"totalPrice":4,"discount":0,"addition":0},{"id":"11e1da52-6715-4cdc-8250-3db2668c20f4","name":"Fanta","quantity":1,"price":10.9,"totalPrice":10.9,"discount":0,"addition":0},{"id":"da7c8e85-8f76-4df9-a464-afab54e23ad9","name":"2 mousses","quantity":1,"price":13.8,"totalPrice":13.8,"discount":0,"addition":0},{"id":"7a66574b-259f-46db-ad2d-9d6b554e65d9","name":"4 queijos","quantity":1,"price":16.45,"totalPrice":16.45,"discount":0,"addition":0},{"id":"fefcccfd-604b-4b9a-90a2-c9023bae6958","name":"A moda","quantity":1,"price":18.45,"totalPrice":18.45,"discount":0,"addition":0}]}],"subTotal":69.6,"totalPrice":89.6,"deliveryFee":20,"deliveryAddress":{"formattedAddress":"PEDIDO DE TESTE - N\u00c3O ENTREGAR - R. Divina Luz, 61","country":"BR","state":"AC","city":"Bujari","coordinates":{"latitude":-9.825868,"longitude":-67.948632},"neighborhood":"Amendoa","streetName":"PEDIDO DE TESTE - N\u00c3O ENTREGAR - R. Divina Luz","streetNumber":"61","postalCode":"00000000","reference":"Em cima do poste","complement":"Bloco"},"deliveryDateTime":"2019-10-21T16:04:39.902Z","preparationStartDateTime":"2019-10-21T15:44:39.902Z","localizer":{"id":"20787445"},"preparationTimeInSeconds":0,"isTest":true}}';
+        //$dadosBD = '{"polling":[{"id":"22323f72-842f-455c-979b-5fa6d56acfb5","code":"PLACED","correlationId":"6193176434464066","createdAt":"2019-10-21T15:44:40.409Z"}],"reference":"6193176434464066","order":{"id":"c2976349-3665-4a25-b4ab-453363683b69","reference":"6193176434464066","shortReference":"5728","createdAt":"2019-10-21T15:44:39.902Z","scheduled":false,"type":"DELIVERY","merchant":{"id":"68bb790f-e24f-4666-ad64-86baf9ca2337","shortId":"208040","name":"TESTE Formula System","address":{"formattedAddress":"RAMAL BUJARI","country":"BR","state":"AC","city":"BUJARI","neighborhood":"bujari","streetName":"RAMAL BUJARI","streetNumber":"123","postalCode":"69923000"}},"payments":[{"name":"D\u00c9BITO - MASTERCARD (M\u00c1QUINA)","code":"MEREST","value":89.6,"prepaid":false}],"customer":{"id":"109125238","name":"PEDIDO DE TESTE - Pedro Henrique","taxPayerIdentificationNumber":"11427599629","phone":"0800 007 0110 ID: 20787445","ordersCountOnRestaurant":0},"items":[{"id":"eaa65d78-0720-4d9f-ad25-83c23a24efe7","name":"PEDIDO DE TESTE - Pizza novo cadastro de adicional","quantity":1,"price":0,"subItemsPrice":69.6,"totalPrice":69.6,"discount":0,"addition":0,"externalCode":"H","subItems":[{"id":"e5fe43a7-12f7-40d8-9e50-9e5d4bc962cb","name":"Borda Catupiry","quantity":1,"price":6,"totalPrice":6,"discount":0,"addition":0,"externalCode":"R1"},{"id":"3cd9379b-a491-464d-a499-2aa8e42ff917","name":"Bacon","quantity":1,"price":4,"totalPrice":4,"discount":0,"addition":0},{"id":"11e1da52-6715-4cdc-8250-3db2668c20f4","name":"Fanta","quantity":1,"price":10.9,"totalPrice":10.9,"discount":0,"addition":0},{"id":"da7c8e85-8f76-4df9-a464-afab54e23ad9","name":"2 mousses","quantity":1,"price":13.8,"totalPrice":13.8,"discount":0,"addition":0},{"id":"7a66574b-259f-46db-ad2d-9d6b554e65d9","name":"4 queijos","quantity":1,"price":16.45,"totalPrice":16.45,"discount":0,"addition":0},{"id":"fefcccfd-604b-4b9a-90a2-c9023bae6958","name":"A moda","quantity":1,"price":18.45,"totalPrice":18.45,"discount":0,"addition":0}]}],"subTotal":69.6,"totalPrice":89.6,"deliveryFee":20,"deliveryAddress":{"formattedAddress":"PEDIDO DE TESTE - N\u00c3O ENTREGAR - R. Divina Luz, 61","country":"BR","state":"AC","city":"Bujari","coordinates":{"latitude":-9.825868,"longitude":-67.948632},"neighborhood":"Amendoa","streetName":"PEDIDO DE TESTE - N\u00c3O ENTREGAR - R. Divina Luz","streetNumber":"61","postalCode":"00000000","reference":"Em cima do poste","complement":"Bloco"},"deliveryDateTime":"2019-10-21T16:04:39.902Z","preparationStartDateTime":"2019-10-21T15:44:39.902Z","localizer":{"id":"20787445"},"preparationTimeInSeconds":0,"isTest":true}}';
         $this->registraCliente();
         $this->cadastraPedido();
         $this->processaPagamentos();
@@ -359,17 +374,19 @@ class IfoodController extends Controller
     public function proccessaPolling()
     {
         foreach ($this->polling as $i => $v) {
+            $this->id = $v['id'];
             $this->correlationid = $v['correlationId'];
             $this->createdAt = date('Y-m-d H:i:s', strtotime($v['createdAt']));
-            if ($v['code'] == 'PLACED') {
+            $this->code = $v['code'];
+            if($this->code == 'PLACED'){
                 $this->orders();
-            } else {
-                //CANCELLATION_REQUESTED
-                //CANCELLED
-                //CANCELLATION_REQUEST_FAILED
-                //Outros status
             }
-            $this->acknowledgment[] = array('id' => $this->correlationid);
+            //PLACED
+            //CANCELLATION_REQUESTED
+            //CANCELLED
+            //CANCELLATION_REQUEST_FAILED
+            //Outros status
+            $this->acknowledgment[] = array('id' => $this->id);
         }
         $this->acknowledgment();
     }
@@ -384,6 +401,7 @@ class IfoodController extends Controller
         if (!empty($this->curlBody) and ($this->curlHttp == 200) or $this->curlHttp == 201) {
             //"[{"id":"bee06149-1c26-4bf1-aef3-6983ea65c590","code":"PLACED","correlationId":"3199106436775033","createdAt":"2019-10-21T15:13:40.841Z"}]"
             $this->polling = json_decode($this->curlBody, true);
+            
             $this->proccessaPolling();
         } else {
             if ($this->curlHttp != 404) {
@@ -648,12 +666,10 @@ class IfoodController extends Controller
         $this->integration();
     }
 
-    public function dispatchIfood(Request $request)
+    public function dispatchIfood($ids)
     {
 
-        $reference = !empty($request->all()) ? $request->all() : array();
-        $reference['reference'] = isset($reference['reference']) ? $reference['reference'] : array();
-        $reference = explode(',', $reference['reference']);
+        $reference = explode(',', $ids);
         if (!empty($reference)) {
             $this->dispatch($reference);
         }

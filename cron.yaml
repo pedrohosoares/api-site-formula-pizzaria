@@ -1,5 +1,6 @@
 cron:
-- description: "Polling ifood"
-  url: /api/ifood/polling
-  schedule: every 1 mins
+- description: "Teste Cron"
+  url: /api/teste
+  timezone: America/Sao_Paulo
+  schedule: every 3 mins
   timezone: "America/Sao_Paulo"

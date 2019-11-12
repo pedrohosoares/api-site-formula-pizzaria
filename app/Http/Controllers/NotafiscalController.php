@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\IpiPedido;
 
 class NotafiscalController extends Controller
 {
@@ -19,9 +18,8 @@ class NotafiscalController extends Controller
     public $cnpj_emitente;
     public $origem;
 
-    
 
-    public function cria_nfce(){
+    public function cria_nfce($cod_pedidos){
         //POST / v2/nfce?ref=REFERENCIA
     }
     

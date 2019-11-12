@@ -39,15 +39,111 @@ use App\Models\IpiTamanhosIpiAdicionaisEstoque;
 use App\Models\IpiTamanhosIpiBordasEstoque;
 use App\Models\IpiTamanhosIpiOpcoesCorte;
 use App\Models\IpiTamanhosIpiTipoMassa;
-
 use App\Models\IpiIngredientesIpiTamanho;
 use App\Models\IpiIngrediente;
 use App\Models\IpiAdicionai;
 use App\Models\IpiOpcoesCorte;
+use App\Models\IpiPizzaria;
 use App\Models\IpiTipoMassa;
+use Illuminate\Support\Facades\DB;
+
+//use File;
+use Illuminate\Filesystem\Filesystem;
+
+use PDF;
+use GoogleCloudPrint;
+
 
 class CuponsController extends Controller
 {
+
+    public function teste()
+    {
+        $pdf = PDF::loadHTML("<h1>DEU</h2>")->setPaper('a6', 'landscape')->setWarnings(false)->save('myfile.pdf');
+    }
+
+    public function printgoogle($impressora, $url)
+    {
+        //$url = "https://www.google.com/cloudprint/submit?printerid=62cf9383-170c-cc68-1af5-55e7b7bc61c3&title=teste&ticket=ticket&content=http://formula-api-11.appspot.com/api/cupons/cupom-pedido-ifood/377146";
+        //'http://formula-api-11.appspot.com/api/cupons/cupom-pedido-ifood/377146'
+        GoogleCloudPrint::asHtml()
+            ->url($url)
+            ->printer($impressora)
+            ->send();
+    }
+
+    public function resgataIdImpressora($cod_pedido)
+    {
+        $impressoras = DB::table('ipi_pizzarias')->leftJoin('ipi_pedidos', 'ipi_pedidos.cod_pizzarias', '=', 'ipi_pizzarias.cod_pizzarias')->where('ipi_pedidos.cod_pedidos', '=', $cod_pedido)->select(['ipi_pizzarias.print_node_impressora', 'ipi_pizzarias.print_node_impressora2'])->first();
+        return $impressoras;
+    }
+
+    public function excluirCupons()
+    {
+        $files = new Filesystem;
+        $files->cleanDirectory('cupons/');
+    }
+
+    private function mudaStatusParaImpresso($cod_pedido, $coluna, $status)
+    {
+        $pedido = IpiPedido::find($cod_pedido);
+        $pedido->$coluna = $status;
+        $pedido->save();
+    }
+
+    public function printnode($impressora, $nomePDF)
+    {
+        $printer_id = $impressora;
+        $credenciais = new PrintNode\Credentials();
+        $credenciais->apikey = '90fe305a8fb32d64a367652215bd57161efaca2f';
+        $request = new PrintNode\Request($credenciais);
+        $printer = new PrintNode\Printer;
+        $printer->id = $printer_id;
+        $printJob = new PrintNode\PrintJob();
+        $printJob->printer = $printer_id;
+        $printJob->contentType = 'pdf_uri';
+        $printJob->content = url("/") . '/' . $nomePDF;
+        $printJob->source = 'Impressão';
+        $printJob->title = 'Impressão Pedidos';
+        return $request->post($printJob);
+    }
+
+
+    public function pedidosNovos()
+    {
+        $pedidos = IpiPedido::select(['cod_pedidos', 'origem_pedido'])->where('situacao', 'NOVO')->whereIsNull('agendado')->limit(80)->get();
+        foreach ($pedidos as $pedido) {
+            if ($pedido->origem_pedido == 'IFOOD') {
+                $this->imprimir($pedido->cod_pedido, 'CUPON_IFOOD_COZINHA', 1);
+                $this->imprimir($pedido->cod_pedido, 'CUPON_IFOOD_BALCAO', 0);
+            } else {
+                $this->imprimir($pedido->cod_pedido, 'CUPON_TELEFONE_COZINHA', 1);
+                $this->imprimir($pedido->cod_pedido, 'CUPON_TELEFONE_BALCAO', 0);
+            }
+        }
+    }
+
+    public function reimprimir($cod_pedido, $url_pedido, $nome_cupom)
+    {
+        $impressoras = $this->resgataIdImpressora($cod_pedido);
+        foreach ($impressoras as $impressora) {
+            $url_pedido = env($url_pedido);
+            $this->printgoogle($impressora, $url_pedido . $cod_pedido);
+        }
+        $this->mudaStatusParaImpresso($cod_pedido, "reimpressao", '0');
+    }
+
+    public function imprimir($cod_pedido, $url_pedido, $imprimir = true, $ordemImpressora)
+    {
+
+        $pedido = env($url_pedido) . $cod_pedido;
+
+        if ($imprimir) {
+            $impressoras = $this->resgataIdImpressora($cod_pedido);
+            $this->printgoogle($impressoras[$ordemImpressora], $pedido);
+            $this->mudaStatusParaImpresso($cod_pedido, "situacao", 'IMPRESSO');
+        }
+    }
 
     public function cupom_cozinha_ifood($cod_pedido)
     {
@@ -578,7 +674,7 @@ class CuponsController extends Controller
             $html .= "<td>" . $pedidos->obs_pedido . "</td>";
             $html .= "</tr>";
         }
-        
+
         $pedidosPizza = new IpiPedidosPizza();
         $pedidosPizza = $pedidosPizza->getPedidosPizzas($pedidos->cod_pedidos)->get();
         foreach ($pedidosPizza as $i => $v) {

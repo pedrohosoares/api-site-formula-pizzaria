@@ -114,3 +114,10 @@ Route::prefix('notas')->group(function () {
     Route::get('/criar-nota-telefone', 'FocusNfeController@criar_nota_telefone');
     Route::get('/transformar-pdf', 'FocusNfeController@transformaEmPdf');
 });
+
+
+Route::prefix('sistema')->group(function(){
+    Route::get('/ver-historico/{cod_pedido?}/{ref_nota?}/{cliente?}/{telefone?}/{data_hora_inicial?}/{data_hora_final?}/{cod_pizzaria?}/{situacao?}/{origem?}/{entrega?}/{tempo_envio?}','PizzariasController@ver_historico')->name('ver_historico');
+    Route::get('/cadastrareimprimir/{cod_pedido?}','PizzariasController@cadastrareimprimir')->name('cadastrareimprimir');
+
+});

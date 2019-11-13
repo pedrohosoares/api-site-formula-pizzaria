@@ -230,8 +230,9 @@ class IfoodController extends Controller
             'referencia_cliente' => '',
             'obs_endereco' => $this->order['deliveryAddress']['reference']
         );
+        $cod_clientes = $cliente->cod_clientes;
         $endereco = IpiEndereco::firstOrCreate(
-            ['cod_clientes' => $cliente->cod_clientes],
+            ['cod_clientes' => $cod_clientes],
             $endereco
         );
         $this->cod_enderecos = $endereco->cod_enderecos;

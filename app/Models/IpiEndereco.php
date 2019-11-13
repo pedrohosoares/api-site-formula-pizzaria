@@ -43,6 +43,8 @@ class IpiEndereco extends Eloquent
 	];
 
 	protected $fillable = [
+		'cod_enderecos',
+		'cod_clientes',
 		'apelido',
 		'endereco',
 		'numero',

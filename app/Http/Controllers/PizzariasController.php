@@ -28,7 +28,7 @@ class PizzariasController extends Controller
         $query = DB::table('ipi_pedidos')
             ->select(
                 [
-                    'ipi_pedidos.cod_pedidos', 'ipi_pedidos.valor_entrega', 'ipi_pedidos.cancelamento_json', 'ipi_pedidos.desconto', 'ipi_pedidos.endereco', 'ipi_pedidos.arquivo_json', 'ipi_pedidos.cod_clientes', 'ipi_pedidos.nome_cliente', 'ipi_pedidos.forma_pg', 'ipi_pedidos.situacao', 'ipi_pedidos.horario_agendamento', 'ipi_pedidos.agendado',
+                    'ipi_pedidos.cod_pedidos', 'ipi_pedidos.valor_entrega', 'ipi_pedidos.cancelamento_json', 'ipi_pedidos.desconto', 'ipi_pedidos.endereco','ipi_pedidos.bairro','ipi_pedidos.numero','ipi_pedidos.cidade','ipi_pedidos.estado', 'ipi_pedidos.arquivo_json', 'ipi_pedidos.cod_clientes', 'ipi_pedidos.nome_cliente', 'ipi_pedidos.forma_pg', 'ipi_pedidos.situacao', 'ipi_pedidos.horario_agendamento', 'ipi_pedidos.agendado',
                     'ipi_pizzarias.nome', 'ipi_pedidos.data_hora_inicial', 'ipi_pedidos.data_hora_pedido', 'ipi_pedidos.data_hora_baixa', 'ipi_pedidos.data_hora_cancelamento',
                     'ipi_pedidos.data_hora_envio', 'ipi_pedidos.data_hora_final', 'ipi_pedidos.valor_total', 'ipi_pedidos.origem_pedido'
                 ]
@@ -54,7 +54,8 @@ class PizzariasController extends Controller
             $query = $query->whereBetween('ipi_pedidos.data_hora_inicial', array($data_hora_inicial, $data_hora_final));
         }
         if ('null' != ($cod_pizzaria)) {
-            $query = $query->where('ipi_pedidos.cod_pizzarias', $cod_pizzaria);
+            $cod_pizzaria = explode(',',$cod_pizzaria);
+            $query = $query->whereIn('ipi_pedidos.cod_pizzarias', $cod_pizzaria);
         }
         if ('null' != ($situacao)) {
             $query = $query->where('ipi_pedidos.situacao', $situacao);
@@ -68,5 +69,19 @@ class PizzariasController extends Controller
         $query = $query->orderBy('ipi_pedidos.cod_pedidos', 'DESC')
             ->get();
         return $query;
+    }
+
+
+    public function pizzarias($pizzarias = null){
+        $pizzarias = explode(',',$pizzarias);
+        $pizza = DB::table('ipi_pizzarias')
+        ->select(['cod_pizzarias','nome']);
+        if(!empty($pizzarias[0])){
+            $pizza = $pizza->whereIn('cod_pizzarias',$pizzarias);
+        }
+        $pizza = $pizza->where('situacao','ATIVO')
+        ->orderBy('nome')
+        ->get();
+        return $pizza;
     }
 }

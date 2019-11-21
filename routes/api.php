@@ -27,7 +27,7 @@ Route::get('/pegatodasbordas/{cod_pizzarias}', 'Controller@pegatodasbordas')->na
 Route::get('/pegatodaspizzas/{cod_pizzarias}', 'Controller@buscaSemGroupPizzas')->name('apipegatodaspizzas');
 Route::get('/pegatodasbebidas/{cod_pizzarias}', 'Controller@selecaoBebidas')->name('apipegatodasbebidas');
 Route::get('/buscaIngredientes/{cod_pizzarias}/{cod_tamanho}/{cod_pizza}', 'Controller@buscaIngredientes')->name('apibuscaIngredientes');
-Route::get('/pegatodosadicionais/{cod_pizzarias}', 'Controller@selectIngredientesAdicionais')->name('apipegatodosadicionais');
+Route::get('/pegatodosadicionais/{cod_pizzarias}/{cod_tamanho}', 'Controller@selectIngredientesAdicionais')->name('apipegatodosadicionais');
 
 Route::get('/bebidas/{token}', 'Controller@peddingCancel');
 Route::get('/sobremesas/{token}', 'PedidoController@peddingCancel');
@@ -91,7 +91,10 @@ Route::prefix('ifood')->group(function () {
 
 Route::prefix('cupons')->group(function () {
 
-    Route::get('/teste', 'CuponsController@teste');
+    Route::get('/imprimir-cron/{pizzaria}','CuponsController@imprimirCron');
+    Route::get('/reimprimir-printnode/{cod_pedido}/{url_pedido}/{nome_cupom}', 'CuponsController@reimprimir_printnode')->name('reimprimir_printnode');
+    
+    Route::get('/cria-imprime-printnode/{tipo}/{pedido}/{cnpj}', 'CuponsController@convertePDFEImprime');
 
     Route::get('/reimprimir/{cod_pedido}/{url_pedido}/{nome_cupom}', 'CuponsController@reimprimir')->name('reimprimir');
     Route::get('/excluir-cupons', 'CuponsController@excluirCupons')->name('excluirCupons');
@@ -116,8 +119,19 @@ Route::prefix('notas')->group(function () {
 });
 
 
-Route::prefix('sistema')->group(function(){
-    Route::get('/ver-historico/{cod_pedido?}/{ref_nota?}/{cliente?}/{telefone?}/{data_hora_inicial?}/{data_hora_final?}/{cod_pizzaria?}/{situacao?}/{origem?}/{entrega?}/{tempo_envio?}','PizzariasController@ver_historico')->name('ver_historico');
-    Route::get('/cadastrareimprimir/{cod_pedido?}','PizzariasController@cadastrareimprimir')->name('cadastrareimprimir');
+Route::prefix('sistema')->group(function () {
+    Route::match(['post','get'],'/login/{username}/{senha}', 'SistemaController@login');
+    Route::get('/bebidas/{cod_pizzaria?}/{status?}', 'BebidaController@getBebidasPizzaria');
+    Route::get('/borda/{cod_tamanhos?}/{cod_pizzarias?}', 'PizzaController@getBorda');
+    Route::get('/sabor/{cod_tamanhos?}/{cod_pizzarias?}', 'PizzaController@getSabor');
+    Route::get('/pizzarias/{id?}', 'PizzariasController@pizzarias');
+    Route::get('/tamanhos/{id?}','TamanhoController@getTamanhos');
+    Route::get('/n_fracoes/{id?}/{cod_pizzaria?}','PizzaController@getNumeroSabor');
+    Route::get('/n_corte/{id?}/{cod_pizzaria?}','PizzaController@getCorte');
+    Route::match(['post','get'],'/clientes/{dado?}', 'ClienteController@getCliente');
+    Route::get('/paginas/{acao}/{cod_paginas?}', 'SistemaController@paginas');
+    Route::get('/menu-site/{logins}','SistemaController@menu_site');
 
+    Route::get('/ver-historico/{cod_pedido?}/{ref_nota?}/{cliente?}/{telefone?}/{data_hora_inicial?}/{data_hora_final?}/{cod_pizzaria?}/{situacao?}/{origem?}/{entrega?}/{tempo_envio?}', 'PizzariasController@ver_historico')->name('ver_historico');
+    Route::get('/cadastrareimprimir/{cod_pedido?}', 'PizzariasController@cadastrareimprimir')->name('cadastrareimprimir');
 });

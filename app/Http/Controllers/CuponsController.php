@@ -49,17 +49,65 @@ use Illuminate\Support\Facades\DB;
 
 //use File;
 use Illuminate\Filesystem\Filesystem;
-
-use PDF;
+use File;
+use Storage;
 use GoogleCloudPrint;
 
 
 class CuponsController extends Controller
 {
 
-    public function teste()
+    public function imprimirCron($pizzaria)
     {
-        $pdf = PDF::loadHTML("<h1>DEU</h2>")->setPaper('a6', 'landscape')->setWarnings(false)->save('myfile.pdf');
+        $pedidos = DB::table('ipi_pedidos')
+            ->select(['ipi_pizzarias.cnpj', 'ipi_pizzarias.print_node_impressora', 'ipi_pizzarias.print_node_impressora2', 'ipi_pedidos.cod_pedidos', 'ipi_pedidos.origem_pedido'])
+            ->leftJoin('ipi_pizzarias', 'ipi_pedidos.cod_pizzarias', '=', 'ipi_pizzarias.cod_pizzarias')
+            ->where('ipi_pedidos.cod_pizzarias', '=', $pizzaria)
+            ->where('ipi_pedidos.situacao', '=', 'NOVO')
+            ->limit(30)
+            ->get();
+        foreach ($pedidos as $p) {
+            if ($p->origem_pedido == 'IFOOD') {
+                $this->convertePDFEImprime('ifood_pedido', $p->cod_pedidos, $p->cnpj);
+                $this->convertePDFEImprime('ifood_cozinha', $p->cod_pedidos, $p->cnpj);
+            }
+            if ($p->origem_pedido == 'TEL' or $p->origem_pedido == 'NET') {
+                $this->convertePDFEImprime('tel_pedido', $p->cod_pedidos, $p->cnpj);
+                $this->convertePDFEImprime('tel_cozinha', $p->cod_pedidos, $p->cnpj);
+            }
+            $this->mudaStatusParaImpresso($p->cod_pedidos, "situacao", 'IMPRESSO');
+        }
+    }
+
+    public function convertePDFEImprime($tipo, $pedido, $cnpj)
+    {
+
+        if (!File::isDirectory('cupons/' . $cnpj)) {
+            File::makeDirectory('cupons/' . $cnpj, 0777, true, true);
+        }
+        if ($tipo == 'ifood_pedido') {
+            $html = $this->cupom_pedido_ifood($pedido);
+            $tamanho = 800;
+        }
+        if ($tipo == 'ifood_cozinha') {
+            $html = $this->cupom_cozinha_ifood($pedido);
+            $tamanho = 500;
+        }
+        if ($tipo == 'tel_pedido') {
+            $html = $this->cupom_pedido_tel($pedido);
+            $tamanho = 800;
+        }
+        if ($tipo == 'tel_cozinha') {
+            $html = $this->cupom_cozinha_tel($pedido);
+            $tamanho = 500;
+        }
+        $pdf = \PDF::setPaper(
+            [0, 15, 205, $tamanho]
+        )->loadHTML($html)->save('cupons/' . $cnpj . '/' . $pedido . '_' . $tipo . '.pdf');
+        if ($pdf) {
+            $caminho = url('/') . '/cupons/' . $cnpj . '/' . $pedido . '_' . $tipo . '.pdf';
+            $this->printnode('69176884', $caminho);
+        }
     }
 
     public function printgoogle($impressora, $url)
@@ -74,7 +122,7 @@ class CuponsController extends Controller
 
     public function resgataIdImpressora($cod_pedido)
     {
-        $impressoras = DB::table('ipi_pizzarias')->leftJoin('ipi_pedidos', 'ipi_pedidos.cod_pizzarias', '=', 'ipi_pizzarias.cod_pizzarias')->where('ipi_pedidos.cod_pedidos', '=', $cod_pedido)->select(['ipi_pizzarias.print_node_impressora', 'ipi_pizzarias.print_node_impressora2'])->first();
+        $impressoras = DB::table('ipi_pizzarias')->leftJoin('ipi_pedidos', 'ipi_pedidos.cod_pizzarias', '=', 'ipi_pizzarias.cod_pizzarias')->where('ipi_pedidos.cod_pedidos', '=', $cod_pedido)->select(['ipi_pizzarias.cod_pizzarias', 'ipi_pizzarias.print_node_impressora', 'ipi_pizzarias.print_node_impressora2'])->first();
         return $impressoras;
     }
 
@@ -91,18 +139,36 @@ class CuponsController extends Controller
         $pedido->save();
     }
 
+    public function reimprimir_printnode($cod_pedido, $url_pedido, $nome_cupom)
+    {
+        $cod_pedido = explode(',', $cod_pedido);
+        foreach ($cod_pedido as $c) {
+            $impressoras = $this->resgataIdImpressora($c);
+            $url_pedido = env($url_pedido);
+            if ($nome_cupom == 'IFOOD') {
+                $this->convertePDFEImprime('ifood_pedido', $c, $impressoras->cod_pizzarias);
+                $this->convertePDFEImprime('ifood_cozinha', $c, $impressoras->cod_pizzarias);
+            }
+            if ($nome_cupom == 'TEL' or $nome_cupom == 'NET') {
+                $this->convertePDFEImprime('tel_pedido', $c, $impressoras->cod_pizzarias);
+                $this->convertePDFEImprime('tel_cozinha', $c, $impressoras->cod_pizzarias);
+            }
+            //$this->mudaStatusParaImpresso($cod_pedido, "reimpressao", '0');
+        }
+    }
+
     public function printnode($impressora, $nomePDF)
     {
         $printer_id = $impressora;
-        $credenciais = new PrintNode\Credentials();
+        $credenciais = new \PrintNode\Credentials();
         $credenciais->apikey = '90fe305a8fb32d64a367652215bd57161efaca2f';
-        $request = new PrintNode\Request($credenciais);
-        $printer = new PrintNode\Printer;
+        $request = new \PrintNode\Request($credenciais);
+        $printer = new \PrintNode\Printer;
         $printer->id = $printer_id;
-        $printJob = new PrintNode\PrintJob();
+        $printJob = new \PrintNode\PrintJob();
         $printJob->printer = $printer_id;
         $printJob->contentType = 'pdf_uri';
-        $printJob->content = url("/") . '/' . $nomePDF;
+        $printJob->content = $nomePDF;
         $printJob->source = 'Impressão';
         $printJob->title = 'Impressão Pedidos';
         return $request->post($printJob);

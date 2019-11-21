@@ -20,10 +20,6 @@ class TamanhoController extends Controller
 {
     public function getTamanhos($limit = 10){
         $tamanhos = IpiTamanho::limit(10)->get();
-        foreach($tamanhos as $v){
-            dump($v->ipi_tipo_massas());
-        }
-        dd('fim');
         return $tamanhos;
     }
 }

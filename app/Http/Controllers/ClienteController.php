@@ -40,6 +40,8 @@ use App\Models\IpiEnquete;
 use App\Models\IpiEnquetePergunta;
 use App\Models\IpiTamanho;
 
+use Illuminate\Support\Facades\DB;
+
 use View;
 
 class ClienteController extends Controller
@@ -154,6 +156,24 @@ class ClienteController extends Controller
     {
         $pedidos = IpiPedido::where('cod_clientes',$this->cod_clientes)->paginate(6);
         return view('clientes.user', ['pedidos' => $pedidos]);
+    }
+
+    public function getCliente($dado){
+        return DB::table('ipi_clientes')
+        ->select(['ipi_clientes.cod_clientes','ipi_clientes.email','ipi_clientes.nome',
+        'ipi_clientes.celular','ipi_enderecos.cod_enderecos','ipi_enderecos.endereco',
+        'ipi_enderecos.numero','ipi_enderecos.bairro','ipi_enderecos.complemento',
+        'ipi_enderecos.edificio','ipi_enderecos.cidade','ipi_enderecos.telefone_1',
+        'ipi_enderecos.telefone_2'])
+        ->rightJoin('ipi_enderecos','ipi_clientes.cod_clientes','=','ipi_enderecos.cod_clientes')
+        ->where('ipi_clientes.nome','like',$dado.'%')
+        ->whereOr('ipi_clientes.email','like',$dado.'%')
+        ->whereOr('ipi_clientes.cpf','like',$dado.'%')
+        ->whereOr('ipi_clientes.celular','like',$dado.'%')
+        ->whereOr('ipi_clientes.telefone_1','like',$dado.'%')
+        ->whereOr('ipi_clientes.telefone_2','like',$dado.'%')
+        ->limit(10)
+        ->get();
     }
 
     public function pedidoCompleto(Request $request)

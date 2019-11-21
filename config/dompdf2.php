@@ -141,7 +141,7 @@ return array(
          *
          * @see CPDF_Adapter::PAPER_SIZES for valid sizes ('letter', 'legal', 'A4', etc.)
          */
-        "default_paper_size" => "a6",
+        "default_paper_size" => [0,0,204,250],
 
         /**
          * The default font family

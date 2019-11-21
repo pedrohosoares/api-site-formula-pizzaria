@@ -1,0 +1,10 @@
+http://localhost:8000/api/sistema/clientes/teste
+http://localhost:8000/api/sistema/tamanhos/
+http://localhost:8000/api/sistema/pizzarias
+http://localhost:8000/api/sistema/n_fracoes/2/2
+http://localhost:8000/api/sistema/n_corte/3
+http://localhost:8000/api/sistema/borda/1/1
+http://localhost:8000/api/sistema/sabor/1/1
+http://localhost:8000/api/buscaIngredientes/1/4/2
+http://localhost:8000/api/pegatodosadicionais/1/4
+

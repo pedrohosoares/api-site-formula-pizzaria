@@ -120,4 +120,5 @@ class IpiCliente extends Eloquent
 	{
 		return $this->hasMany(\App\Models\IpiTelemarketingAtivoResposta::class, 'cod_clientes');
 	}
+
 }

@@ -92,7 +92,7 @@ Route::prefix('ifood')->group(function () {
 Route::prefix('cupons')->group(function () {
 
     Route::get('/imprimir-cron/{pizzaria}','CuponsController@imprimirCron');
-    Route::get('/reimprimir-printnode/{cod_pedido}/{url_pedido}/{nome_cupom}', 'CuponsController@reimprimir_printnode')->name('reimprimir_printnode');
+    Route::get('/reimprimir-printnode/{cod_pedido}', 'CuponsController@reimprimir_printnode')->name('reimprimir_printnode');
     
     Route::get('/cria-imprime-printnode/{tipo}/{pedido}/{cnpj}', 'CuponsController@convertePDFEImprime');
 
@@ -126,8 +126,9 @@ Route::prefix('sistema')->group(function () {
     Route::get('/sabor/{cod_tamanhos?}/{cod_pizzarias?}', 'PizzaController@getSabor');
     Route::get('/pizzarias/{id?}', 'PizzariasController@pizzarias');
     Route::get('/tamanhos/{id?}','TamanhoController@getTamanhos');
-    Route::get('/n_fracoes/{id?}/{cod_pizzaria?}','PizzaController@getNumeroSabor');
-    Route::get('/n_corte/{id?}/{cod_pizzaria?}','PizzaController@getCorte');
+    Route::get('/n_fracoes/{cod_tamanho?}/{cod_pizzaria?}','PizzaController@getNumeroSabor');
+    Route::get('/quantidade_sabores','PizzaController@getQuantidadeSabor');
+    Route::get('/n_corte/{cod_tamanho?}','PizzaController@getCorte');
     Route::match(['post','get'],'/clientes/{dado?}', 'ClienteController@getCliente');
     Route::get('/paginas/{acao}/{cod_paginas?}', 'SistemaController@paginas');
     Route::get('/menu-site/{logins}','SistemaController@menu_site');

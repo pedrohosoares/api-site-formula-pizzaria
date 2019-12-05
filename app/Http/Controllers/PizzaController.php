@@ -38,6 +38,11 @@ class PizzaController extends TamanhoController
         return $fracoes;
     }
 
+    public function getQuantidadeSabor(){
+        $fracoes = DB::table('ipi_fracoes')->get();
+        return $fracoes;
+    }
+
     public function getSabor($cod_tamanhos = null ,$cod_pizzaria = null){
         $sabor = DB::table('ipi_pizzas_ipi_tamanhos')
         ->leftJoin('ipi_pizzas','ipi_pizzas.cod_pizzas','=','ipi_pizzas_ipi_tamanhos.cod_pizzas');

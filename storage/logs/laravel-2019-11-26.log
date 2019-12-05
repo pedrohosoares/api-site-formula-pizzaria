@@ -1,0 +1,4 @@
+[2019-11-26 16:05:41] local.ERROR: Allowed memory size of 134217728 bytes exhausted (tried to allocate 53514808 bytes) {"exception":"[object] (Symfony\\Component\\Debug\\Exception\\FatalErrorException(code: 1): Allowed memory size of 134217728 bytes exhausted (tried to allocate 53514808 bytes) at C:\\xampp\\htdocs\\api-site-formula-pizzaria\\vendor\\doctrine\\dbal\\lib\\Doctrine\\DBAL\\Driver\\PDOStatement.php:121)
+[stacktrace]
+#0 {main}
+"} 

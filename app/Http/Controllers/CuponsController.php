@@ -68,18 +68,18 @@ class CuponsController extends Controller
             ->get();
         foreach ($pedidos as $p) {
             if ($p->origem_pedido == 'IFOOD') {
-                $this->convertePDFEImprime('ifood_pedido', $p->cod_pedidos, $p->cnpj);
-                $this->convertePDFEImprime('ifood_cozinha', $p->cod_pedidos, $p->cnpj);
+                $this->convertePDFEImprime('ifood_pedido', $p->cod_pedidos, $p->cnpj,$p->print_node_impressora);
+                $this->convertePDFEImprime('ifood_cozinha', $p->cod_pedidos, $p->cnpj,$p->print_node_impressora2);
             }
             if ($p->origem_pedido == 'TEL' or $p->origem_pedido == 'NET') {
-                $this->convertePDFEImprime('tel_pedido', $p->cod_pedidos, $p->cnpj);
-                $this->convertePDFEImprime('tel_cozinha', $p->cod_pedidos, $p->cnpj);
+                $this->convertePDFEImprime('tel_pedido', $p->cod_pedidos, $p->cnpj,$p->print_node_impressora);
+                $this->convertePDFEImprime('tel_cozinha', $p->cod_pedidos, $p->cnpj,$p->print_node_impressora2);
             }
             $this->mudaStatusParaImpresso($p->cod_pedidos, "situacao", 'IMPRESSO');
         }
     }
 
-    public function convertePDFEImprime($tipo, $pedido, $cnpj)
+    public function convertePDFEImprime($tipo, $pedido, $cnpj,$impressora)
     {
 
         if (!File::isDirectory('cupons/' . $cnpj)) {
@@ -106,7 +106,7 @@ class CuponsController extends Controller
         )->loadHTML($html)->save('cupons/' . $cnpj . '/' . $pedido . '_' . $tipo . '.pdf');
         if ($pdf) {
             $caminho = url('/') . '/cupons/' . $cnpj . '/' . $pedido . '_' . $tipo . '.pdf';
-            $this->printnode('69176884', $caminho);
+            $this->printnode($impressora, $caminho);
         }
     }
 
@@ -139,19 +139,29 @@ class CuponsController extends Controller
         $pedido->save();
     }
 
-    public function reimprimir_printnode($cod_pedido, $url_pedido, $nome_cupom)
+    public function reimprimir_printnode($cod_pedido)
     {
         $cod_pedido = explode(',', $cod_pedido);
-        foreach ($cod_pedido as $c) {
-            $impressoras = $this->resgataIdImpressora($c);
-            $url_pedido = env($url_pedido);
-            if ($nome_cupom == 'IFOOD') {
-                $this->convertePDFEImprime('ifood_pedido', $c, $impressoras->cod_pizzarias);
-                $this->convertePDFEImprime('ifood_cozinha', $c, $impressoras->cod_pizzarias);
+        $cod_pedidos = DB::table('ipi_pedidos')
+        ->select(['ipi_pizzarias.cnpj', 'ipi_pizzarias.cod_pizzarias','ipi_pizzarias.print_node_impressora', 'ipi_pizzarias.print_node_impressora2', 'ipi_pedidos.cod_pedidos', 'ipi_pedidos.origem_pedido'])
+        ->leftJoin('ipi_pizzarias','ipi_pizzarias.cod_pizzarias','=','ipi_pedidos.cod_pizzarias')
+        ->whereIn('ipi_pedidos.cod_pedidos',$cod_pedido)
+        ->get();
+        foreach ($cod_pedidos as $c) {
+            /**
+             * CUPON_IFOOD_COZINHA
+                CUPON_IFOOD_BALCAO
+                CUPON_TELEFONE_COZINHA
+                CUPON_TELEFONE_BALCAO
+                CUPON_CANCELAMENTO
+             */
+            if ($c->origem_pedido == 'IFOOD') {
+                $this->convertePDFEImprime('ifood_pedido', $c->cod_pedidos, $c->cod_pizzarias,$c->print_node_impressora);
+                $this->convertePDFEImprime('ifood_cozinha', $c->cod_pedidos, $c->cod_pizzarias,$c->print_node_impressora2);
             }
-            if ($nome_cupom == 'TEL' or $nome_cupom == 'NET') {
-                $this->convertePDFEImprime('tel_pedido', $c, $impressoras->cod_pizzarias);
-                $this->convertePDFEImprime('tel_cozinha', $c, $impressoras->cod_pizzarias);
+            if ($c->origem_pedido == 'TEL' or $c->origem_pedido == 'NET') {
+                $this->convertePDFEImprime('tel_pedido', $c->cod_pedidos, $c->cod_pizzarias,$c->print_node_impressora);
+                $this->convertePDFEImprime('tel_cozinha', $c->cod_pedidos, $c->cod_pizzarias,$c->print_node_impressora2);
             }
             //$this->mudaStatusParaImpresso($cod_pedido, "reimpressao", '0');
         }

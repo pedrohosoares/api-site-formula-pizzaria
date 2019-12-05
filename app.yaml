@@ -14,8 +14,8 @@ env_variables:
   APP_KEY: base64:vA6NpNXmJUR4Qoh0mhNit+oKBqe/xcsFi1lu03oRWrg=
   APP_DEBUG: false
   DB_CONNECTION: mysql
-  DB_HOST: 18.214.220.91
+  DB_HOST: 34.95.147.151
   DB_PORT: 3306
   DB_DATABASE: formula_pr
-  DB_USERNAME: pedrosoares
-  DB_PASSWORD: 46302113
+  DB_USERNAME: usuario
+  DB_PASSWORD: 46302113&Gcloud

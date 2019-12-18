@@ -68,20 +68,18 @@ class CuponsController extends Controller
             ->get();
         foreach ($pedidos as $p) {
             if ($p->origem_pedido == 'IFOOD') {
-                $this->convertePDFEImprime('ifood_pedido', $p->cod_pedidos, $p->cnpj,$p->print_node_impressora);
-                $this->convertePDFEImprime('ifood_cozinha', $p->cod_pedidos, $p->cnpj,$p->print_node_impressora2);
+                $this->convertePDFEImprime('ifood_pedido', $p->cod_pedidos, $p->cnpj, $p->print_node_impressora);
+                $this->convertePDFEImprime('ifood_cozinha', $p->cod_pedidos, $p->cnpj, $p->print_node_impressora2);
             }
             if ($p->origem_pedido == 'TEL' or $p->origem_pedido == 'NET') {
-                $this->convertePDFEImprime('tel_pedido', $p->cod_pedidos, $p->cnpj,$p->print_node_impressora);
-                $this->convertePDFEImprime('tel_cozinha', $p->cod_pedidos, $p->cnpj,$p->print_node_impressora2);
+                $this->convertePDFEImprime('tel_pedido', $p->cod_pedidos, $p->cnpj, $p->print_node_impressora);
+                $this->convertePDFEImprime('tel_cozinha', $p->cod_pedidos, $p->cnpj, $p->print_node_impressora2);
             }
-            $this->mudaStatusParaImpresso($p->cod_pedidos, "situacao", 'IMPRESSO');
         }
     }
 
-    public function convertePDFEImprime($tipo, $pedido, $cnpj,$impressora)
+    public function convertePDFEImprime($tipo, $pedido, $cnpj, $impressora)
     {
-
         if (!File::isDirectory('cupons/' . $cnpj)) {
             File::makeDirectory('cupons/' . $cnpj, 0777, true, true);
         }
@@ -107,18 +105,70 @@ class CuponsController extends Controller
         if ($pdf) {
             $caminho = url('/') . '/cupons/' . $cnpj . '/' . $pedido . '_' . $tipo . '.pdf';
             $this->printnode($impressora, $caminho);
+            $this->mudaStatusParaImpresso($pedido, "situacao", 'IMPRESSO');
         }
     }
 
-    public function printgoogle($impressora, $url)
+    public function retornacupomgoogle($tipo, $pedido)
     {
-        //$url = "https://www.google.com/cloudprint/submit?printerid=62cf9383-170c-cc68-1af5-55e7b7bc61c3&title=teste&ticket=ticket&content=http://formula-api-11.appspot.com/api/cupons/cupom-pedido-ifood/377146";
-        //'http://formula-api-11.appspot.com/api/cupons/cupom-pedido-ifood/377146'
-        GoogleCloudPrint::asHtml()
+        if ($tipo == 'ifood_pedido') {
+            $html = $this->cupom_pedido_ifood($pedido);
+        }
+        if ($tipo == 'ifood_cozinha') {
+            $html = $this->cupom_cozinha_ifood($pedido);
+        }
+        if ($tipo == 'tel_pedido') {
+            $html = $this->cupom_pedido_tel($pedido);
+        }
+        if ($tipo == 'tel_cozinha') {
+            $html = $this->cupom_cozinha_tel($pedido);
+        }
+        return $html;
+    }
+
+    public function printgoogle($impressora = null, $url = null)
+    {
+        //$url = "http://35.247.234.64/api/public/api/cupons/cupom-pedido-ifood/391444";
+        //$impressora = "14e69e69-37e0-9df1-eed7-2e8dea327049";
+        $print = GoogleCloudPrint::asHtml()
             ->url($url)
             ->printer($impressora)
             ->send();
+        return $print;
     }
+
+    public function printallgoogle($pizzaria)
+    {
+        $pedidos = DB::table('ipi_pedidos')
+            ->select(['ipi_pizzarias.cnpj', 'ipi_pizzarias.print_node_impressora', 'ipi_pizzarias.print_node_impressora2', 'ipi_pedidos.cod_pedidos', 'ipi_pedidos.origem_pedido'])
+            ->leftJoin('ipi_pizzarias', 'ipi_pedidos.cod_pizzarias', '=', 'ipi_pizzarias.cod_pizzarias')
+            ->where('ipi_pedidos.cod_pizzarias', '=', $pizzaria)
+            ->where('ipi_pedidos.situacao', '=', 'NOVO')
+            ->limit(20)
+            ->get();
+        foreach ($pedidos as $p) {
+            if ($p->origem_pedido == 'IFOOD') {
+                $cupom = env('CUPON_IFOOD_BALCAO').$p->cod_pedidos;
+                $cupomCozinha = env('CUPON_IFOOD_COZINHA').$p->cod_pedidos;
+                #$cupom = $this->retornacupomgoogle('ifood_pedido', $p->cod_pedidos);
+                #$cupomCozinha = $this->retornacupomgoogle('ifood_cozinha', $p->cod_pedidos);
+            }
+            if ($p->origem_pedido == 'TEL' or $p->origem_pedido == 'NET') {
+                $cupom = env('CUPON_TELEFONE_BALCAO').$p->cod_pedidos;
+                $cupomCozinha = env('CUPON_TELEFONE_COZINHA').$p->cod_pedidos;
+                #$cupom = $this->retornacupomgoogle('tel_pedido', $p->cod_pedidos);
+                #$cupomCozinha = $this->retornacupomgoogle('tel_cozinha', $p->cod_pedidos);
+            }
+            $print1 = $this->printgoogle($p->print_node_impressora, $cupom);
+            dump($print1);
+            if($print1){
+            $this->printgoogle($p->print_node_impressora2, $cupomCozinha);
+            }
+            $this->mudaStatusParaImpresso($p->cod_pedidos, "situacao", 'IMPRESSO');
+        }
+    }
+
+
 
     public function resgataIdImpressora($cod_pedido)
     {
@@ -132,7 +182,7 @@ class CuponsController extends Controller
         $files->cleanDirectory('cupons/');
     }
 
-    private function mudaStatusParaImpresso($cod_pedido, $coluna, $status)
+    public function mudaStatusParaImpresso($cod_pedido, $coluna, $status)
     {
         $pedido = IpiPedido::find($cod_pedido);
         $pedido->$coluna = $status;
@@ -143,10 +193,10 @@ class CuponsController extends Controller
     {
         $cod_pedido = explode(',', $cod_pedido);
         $cod_pedidos = DB::table('ipi_pedidos')
-        ->select(['ipi_pizzarias.cnpj', 'ipi_pizzarias.cod_pizzarias','ipi_pizzarias.print_node_impressora', 'ipi_pizzarias.print_node_impressora2', 'ipi_pedidos.cod_pedidos', 'ipi_pedidos.origem_pedido'])
-        ->leftJoin('ipi_pizzarias','ipi_pizzarias.cod_pizzarias','=','ipi_pedidos.cod_pizzarias')
-        ->whereIn('ipi_pedidos.cod_pedidos',$cod_pedido)
-        ->get();
+            ->select(['ipi_pizzarias.cnpj', 'ipi_pizzarias.cod_pizzarias', 'ipi_pizzarias.print_node_impressora', 'ipi_pizzarias.print_node_impressora2', 'ipi_pedidos.cod_pedidos', 'ipi_pedidos.origem_pedido'])
+            ->leftJoin('ipi_pizzarias', 'ipi_pizzarias.cod_pizzarias', '=', 'ipi_pedidos.cod_pizzarias')
+            ->whereIn('ipi_pedidos.cod_pedidos', $cod_pedido)
+            ->get();
         foreach ($cod_pedidos as $c) {
             /**
              * CUPON_IFOOD_COZINHA
@@ -156,12 +206,12 @@ class CuponsController extends Controller
                 CUPON_CANCELAMENTO
              */
             if ($c->origem_pedido == 'IFOOD') {
-                $this->convertePDFEImprime('ifood_pedido', $c->cod_pedidos, $c->cod_pizzarias,$c->print_node_impressora);
-                $this->convertePDFEImprime('ifood_cozinha', $c->cod_pedidos, $c->cod_pizzarias,$c->print_node_impressora2);
+                $this->convertePDFEImprime('ifood_pedido', $c->cod_pedidos, $c->cnpj, $c->print_node_impressora);
+                $this->convertePDFEImprime('ifood_cozinha', $c->cod_pedidos, $c->cnpj, $c->print_node_impressora2);
             }
             if ($c->origem_pedido == 'TEL' or $c->origem_pedido == 'NET') {
-                $this->convertePDFEImprime('tel_pedido', $c->cod_pedidos, $c->cod_pizzarias,$c->print_node_impressora);
-                $this->convertePDFEImprime('tel_cozinha', $c->cod_pedidos, $c->cod_pizzarias,$c->print_node_impressora2);
+                $this->convertePDFEImprime('tel_pedido', $c->cod_pedidos, $c->cnpj, $c->print_node_impressora);
+                $this->convertePDFEImprime('tel_cozinha', $c->cod_pedidos, $c->cnpj, $c->print_node_impressora2);
             }
             //$this->mudaStatusParaImpresso($cod_pedido, "reimpressao", '0');
         }
@@ -487,6 +537,24 @@ class CuponsController extends Controller
         $html .= "<td colspan='2' style='border-top:2px dotted #000;'></td>";
         $html .= "</tr>";
         $valorPrePago = 0.00;
+        if (isset($order['benefits'])) {
+            foreach ($order['benefits'] as $beneficius => $valorBene) {
+                if (!empty($valorBene['sponsorshipValues']['IFOOD'])) {
+                    $valorPrePago += (float) $valorBene['sponsorshipValues']['IFOOD'];
+                    $html .= "<tr>";
+                    $html .= "<td>VOUCHER IFOOD: </td>";
+                    $html .= "<td>R$" . $valorBene['sponsorshipValues']['IFOOD'] . "</td>";
+                    $html .= "</tr>";
+                }
+                if (!empty($valorBene['sponsorshipValues']['MERCHANT'])) {
+                    $valorPrePago += (float) $valorBene['sponsorshipValues']['MERCHANT'];
+                    $html .= "<tr>";
+                    $html .= "<td>VOUCHER LOJA: </td>";
+                    $html .= "<td>R$" . $valorBene['sponsorshipValues']['MERCHANT'] . "</td>";
+                    $html .= "</tr>";
+                }
+            }
+        }
         foreach ($payments as $kp => $vp) {
             $html .= "<tr>";
             $html .= "<td>MEIO: </td>";
@@ -717,7 +785,7 @@ class CuponsController extends Controller
         $html .= '<title>Pedido - Fórmula Pizzaria</title>';
         $html .= '<style>';
         $html .= 'body{min-height:auto;}';
-        $html .= 'body table{max-width: 375px; margin: auto; font-family: sans-serif;}';
+        $html .= 'body table{max-width: 300px; margin: auto; font-family: sans-serif;}';
         $html .= '@media print {body{width:100%;margin:1px;}table{/*width:143.9999% !important;*/width:100% !important;margin:1px;}}@page{margin:1px;}';
         $html .= '</style>';
         $html .= '</head>';
@@ -750,7 +818,6 @@ class CuponsController extends Controller
             $html .= "<td>" . $pedidos->obs_pedido . "</td>";
             $html .= "</tr>";
         }
-
         $pedidosPizza = new IpiPedidosPizza();
         $pedidosPizza = $pedidosPizza->getPedidosPizzas($pedidos->cod_pedidos)->get();
         foreach ($pedidosPizza as $i => $v) {
@@ -764,6 +831,7 @@ class CuponsController extends Controller
             $html .= '<td><strong>TAMANHO</strong>: </td>';
             $html .= '<td>' . $tamanhos->tamanho . '</td>';
             $html .= '</tr>';
+
             $html .= '<tr>';
             $html .= '<td>MASSA: </td>';
             $tipo_massa = new IpiTipoMassa();
@@ -844,7 +912,7 @@ class CuponsController extends Controller
         }
 
         $bebidas = new IpiPedidosBebida();
-        $bebidas = $bebidas->getPedidosBebidas($v->cod_pedidos)->get();
+        $bebidas = $bebidas->getPedidosBebidas($cod_pedido)->get();
         if (isset($bebidas[0])) {
             $html .= '<tr>';
             $html .= '<td colspan="2" style="border-top:2px dotted #000;"></td>';
@@ -893,7 +961,6 @@ class CuponsController extends Controller
         $html .= '<tr>';
         $html .= '<td colspan="2" style="border-top:2px dotted #000;"></td>';
         $html .= '</tr>';
-        $html .= '<tr>';
         $html .= '<tr>';
         $html .= '<td>NOME: </td>';
         $html .= '<td>' . $pedidos->nome_cliente . '</td>';

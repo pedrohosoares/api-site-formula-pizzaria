@@ -63,7 +63,8 @@ Route::prefix('ifood')->group(function () {
     //Merchant teste 208040
     Route::get('/json', 'IfoodController@json');
     Route::get('/ifood-token', 'IfoodController@oAuthToken')->name('ifood-token');
-    Route::get('/polling', 'IfoodController@polling')->name('polling');
+    Route::get('/polling', 'IfoodnovoController@start')->name('polling');
+    Route::get('/insere-novo', 'IfoodnovoController@mudaInsereParaNovo')->name('muda-insere-para-novo');
     Route::get('/view-access-token', 'IfoodController@view_access_token')->name('view_access_token');
 
     #CATEGORIAS
@@ -91,8 +92,11 @@ Route::prefix('ifood')->group(function () {
 
 Route::prefix('cupons')->group(function () {
 
+    Route::get('/imprimir-google/{cod_pizzaria}','CuponsController@printallgoogle');
+
     Route::get('/imprimir-cron/{pizzaria}','CuponsController@imprimirCron');
     Route::get('/reimprimir-printnode/{cod_pedido}', 'CuponsController@reimprimir_printnode')->name('reimprimir_printnode');
+    Route::get('/muda-status-pedido/{cod_pedido}/{campo}/{situacao}','CuponsController@mudaStatusParaImpresso');
     
     Route::get('/cria-imprime-printnode/{tipo}/{pedido}/{cnpj}', 'CuponsController@convertePDFEImprime');
 
@@ -113,7 +117,7 @@ Route::prefix('cupons')->group(function () {
 
 Route::prefix('notas')->group(function () {
 
-    Route::get('/criar-nota-ifood/{pedido}', 'FocusNfeController@criar_nota_ifood');
+    Route::get('/criar-nota-ifood/{pedido}/{homologacao?}', 'FocusNfeController@criar_nota_ifood');
     Route::get('/criar-nota-telefone', 'FocusNfeController@criar_nota_telefone');
     Route::get('/transformar-pdf', 'FocusNfeController@transformaEmPdf');
 });
